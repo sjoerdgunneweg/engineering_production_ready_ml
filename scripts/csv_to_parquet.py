@@ -10,18 +10,20 @@ def accelerometer_data_to_parquet(spark, input_path, output_path):
     """
     df = spark.read.csv(input_path, header=True, inferSchema=True)
 
-    df_processed = df.withColumn(
+    time_column_in_seconds = F.col(DataConfig.acceleleration_time_column).cast("double") / 1000 # convert ms to s
+
+    # TODO i dont think i really need both readable_time and measurement_date
+    df_processed = df.withColumn( # TODO dit in een functie die dan in utils komt? hij is er 2 keer 
         "readable_time", 
-        F.from_unixtime(F.col(DataConfig.acceleleration_time_column))
+        F.from_unixtime(time_column_in_seconds)
     ).withColumn(
         "measurement_date",
-        F.to_date(F.from_unixtime(F.col(DataConfig.acceleleration_time_column)))
-    )
+        F.to_date(F.from_unixtime(time_column_in_seconds))
+    )    
 
     df_processed.write.parquet(
         output_path, 
         mode="overwrite", 
-        partitionBy=DataConfig.partition_column
     )
     
 def clean_tac_data_to_parquet(spark, input_path, output_path):
@@ -44,6 +46,7 @@ def clean_tac_data_to_parquet(spark, input_path, output_path):
     )
     
     # convert unix timestamp
+        # TODO i dont think i really need both readable_time and measurement_date
     df_processed = df_with_id.withColumn(
         "readable_time", 
         F.from_unixtime(F.col(DataConfig.tac_time_column))
@@ -55,7 +58,6 @@ def clean_tac_data_to_parquet(spark, input_path, output_path):
     df_processed.write.parquet(
         output_path, 
         mode="overwrite", 
-        partitionBy=DataConfig.partition_column
     )
     
 

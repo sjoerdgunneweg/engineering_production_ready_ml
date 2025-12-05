@@ -8,7 +8,7 @@ format:
 
 .PHONY: build
 build:
-	docker build . -t nova -f infra/build/Dockerfile
+	docker build . -t alcoholerometer -f infra/build/Dockerfile
 
 .PHONY: up
 up: build
