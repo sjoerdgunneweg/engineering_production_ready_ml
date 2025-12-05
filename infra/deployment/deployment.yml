@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: alcoholerometer-app-deployment
+  labels:
+    app: alcoholerometer
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: alcoholerometer
+  template:
+    metadata:
+      labels:
+        app: alcoholerometer
+    spec:
+      containers:
+        - name: alcoholerometer-app
+          image: alcoholerometer:latest
+          command: ["flask"]
+          args: ["--app", "src/api", "run", "--host", "0.0.0.0"]
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 5001
+
+      imagePullSecrets:
+        - name: regcred

@@ -1,0 +1,12 @@
+groups:
+- name: HttpAlerts
+  rules:
+  - alert: HttpNon200ResponseCode
+    expr: sum by (job, instance) (rate(nova_http_request_exceptions_total{code!~"200"}[1m])) > 0
+    for: 1m
+    labels:
+      severity: error
+    annotations:
+      summary: "Non-200 HTTP codes for job '{{ $labels.job }}'"
+      description: "Job '{{ $labels.job }}' on instance '{{ $labels.instance }}' is experiencing non-200 HTTP response codes. The current value is {{ $value }} requests per second."
+      runbook_url: "https://your-runbook-url/http-errors"

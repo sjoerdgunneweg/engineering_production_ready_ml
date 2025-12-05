@@ -2,12 +2,17 @@ services:
 
   training:
     image: alcoholerometer:latest
-    command: python src/main_training.py --preprocess --feat-eng --training
+    command: python src/main.py --preprocess --feat-eng --training
+    depends_on:
+      mlflow:
+        condition: service_healthy
 
   app:
     image: alcoholerometer:latest
-    command: flask --app src/main_api run --host 0.0.0.0 --port 5001
+    command: flask --app src/api run --host 0.0.0.0 --port 5001
     depends_on:
+      mlflow:
+        condition: service_healthy
       prometheus:
         condition: service_healthy
       telemetry_job:
@@ -20,6 +25,16 @@ services:
       test: apt-get update -y && apt-get install -y curl && curl --fail http://localhost:5001/health || exit 1
       retries: 5
       interval: 30s  # Cache loading is taking a long time for this app
+
+  mlflow:
+    image: ghcr.io/mlflow/mlflow:v3.3.0rc0
+    command: mlflow server --host 0.0.0.0 --port 8080
+    ports:
+      - "8080:8080"
+    healthcheck:
+      test: apt-get update -y && apt-get install -y curl && curl --fail http://localhost:8080 || exit 1
+      retries: 3
+      interval: 5s
 
   prometheus:
     image: prom/prometheus:v3.5.0
@@ -46,7 +61,7 @@ services:
 
   telemetry_job:
     image: alcoholerometer:latest
-    command: ["/bin/sh", "-c", "while true; do sleep 10; python src/main_drift_calculation.py ; done"]
+    command: ["/bin/sh", "-c", "while true; do sleep 10; python src/drift_calculation.py ; done"]
     depends_on:
       - prometheus
 
@@ -54,7 +69,7 @@ services:
     image: apache/airflow:3.1.0-python3.10
     command: airflow standalone
     ports:
-      - "8080:8080" 
+      - "4242:8080"  # note: We need to use a different port than 8080 as it is already assigned for mlflow.
     environment:
       - _AIRFLOW_DB_MIGRATE=true
       - AIRFLOW__CORE__SIMPLE_AUTH_MANAGER_ALL_ADMINS=true  # note: Disabling authentication completely.
