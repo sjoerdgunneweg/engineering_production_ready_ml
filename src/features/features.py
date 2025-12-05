@@ -19,21 +19,6 @@ def unix_timestamp_to_readable(unix_timestamp: int) -> str:
 #----------------------------------------------------------
 
 
-import os
-os.listdir('/content/drive/My Drive/CSE512Data/clean_tac')
-
-base_path = '/content/drive/My Drive/CSE512Data/clean_tac'
-my_dict = dict()
-for file_path in os.listdir(base_path):
-  resp_frame = pd.read_csv(base_path + '/'+ file_path)
-  my_dict[file_path.split('_')[0]] = resp_frame
-
-def get_tac_value(pid, t_value):
-  ind = np.argmax(my_dict[pid]['timestamp'] > t_value)
-  if ind != 0:
-    ind = ind - 1
-  return my_dict[pid].iloc[[ind]]['TAC_Reading'].values[0]
-
 def spectral_centroid_spread(fft_magnitude, sampling_rate):
     """Computes spectral centroid of frame (given abs(FFT))"""
     ind = (np.arange(1, len(fft_magnitude) + 1)) * \

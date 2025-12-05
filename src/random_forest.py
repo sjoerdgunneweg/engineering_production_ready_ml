@@ -1,5 +1,6 @@
 import os
 import pickle
+import tempfile
 
 import mlflow
 import pandas as pd
