@@ -5,12 +5,14 @@ import tempfile
 import mlflow
 import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import cross_validate
 
 from configs.configs import ModelConfig, run_config, PathsConfig
 
 class RandomForestModel:
     def __init__(self):
         self._model = None
+        self._cv_scores = None
 
     @staticmethod # TODO wat doet dit?
     def _get_model() -> RandomForestClassifier:
@@ -27,13 +29,25 @@ class RandomForestModel:
         return data.drop("pid", axis=1), data["pid"]
 
 
-    def train_model(self, data):
+    def train_model(self, data) -> None:
         x, y = self._get_x_y(data)
         classifier = self._get_model()
+        self._cv_scores = cross_validate( # TODO check which parameters are needed
+            classifier,
+            x,
+            y,
+            cv=run_config.num_folds,
+            return_train_score=True,
+            n_jobs=-1,
+            scoring=["precision", "recall", "f1"],
+        )
         
         self._model = classifier.fit(x, y)
 
-    def load_model_from_mlflow(self, run_id: str):  # pragma: no cover
+    def get_cv_scores(self) -> dict[str, float]:
+        return self._cv_scores
+
+    def load_model_from_mlflow(self, run_id: str) -> None:  # pragma: no cover
         mlflow_experiment = mlflow.get_experiment_by_name(run_config.experiment_name)
         if mlflow_experiment is None:
             raise RuntimeError(f"Experiment {run_config.experiment_name} does not exist in MLFlow.")

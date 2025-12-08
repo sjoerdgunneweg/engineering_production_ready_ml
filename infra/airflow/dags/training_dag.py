@@ -36,7 +36,7 @@ preprocessing_task = DockerOperator(
 
 feat_eng_task = DockerOperator(
     docker_url="unix://var/run/docker.sock",
-    command="python src/main.py --feat-eng",
+    command="python src/main.py --feat_eng",
     image="alcoholerometer:latest",
     network_mode="infra_default",  # note: In order services to communicate each other, we add them to the same network. You do not see in docker-compose.yaml, b/c by default it puts all the services under one network called "infra_default".
     task_id="feature_engineering",
@@ -60,7 +60,7 @@ model_training_task = DockerOperator(
 
 model_reloading_task = DockerOperator(
     docker_url="unix://var/run/docker.sock",
-    command="python src/main_api.py --reload",
+    command="python src/api.py --reload",
     image="alcoholerometer:latest",
     network_mode="infra_default",
     task_id="model_reloading",

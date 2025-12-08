@@ -2,7 +2,7 @@ services:
 
   training:
     image: alcoholerometer:latest
-    command: python src/main.py --preprocess --feat-eng --training
+    command: python src/main.py --preprocess --feat_eng --training
     depends_on:
       mlflow:
         condition: service_healthy

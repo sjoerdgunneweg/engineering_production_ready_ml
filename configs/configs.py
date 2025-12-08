@@ -11,6 +11,9 @@ class PathsConfig:
     telemetry_training_data_path: str = "data/telemetry/data_dist.json" # TODO change to better path
     telemetry_live_data_path: str = "data/telemetry/live_data_dist.json" # TODO change to better path
 
+    preprocessing_data_path: str = "data/processed/preprocessed_data.parquet"
+    features_data_path: str = "data/processed/features_data.parquet"
+
 @dataclass(init=False, frozen=True)
 class DataConfig:
     acceleleration_time_column: str = "time"
@@ -37,10 +40,11 @@ class _RunConfig:
     app_name: str = "alcoholerometer"
     spark_master_url: str = "local[2]"
     mlflow_tracking_uri: str = "http://mlflow:8080" #"http://localhost:8080"
-    experiment_name: str = "Alpha" # TODO can i set this to something else?
-    run_name: str = "Run_234" # TODO is this needed?
+    experiment_name: str = "Alcoholerometer_Experiment"
+    run_name: str = "alcoholerometer_random_forest_run"
     random_seed: int = 42
     sample_rate: float = 1.0 
+    num_folds: int = 5 # TODO play with this value
 
 @dataclass(frozen=True)
 class TelemetryConfig: # TODO alter to my style
@@ -71,6 +75,7 @@ class ModelConfig:
     random_seed: int = 42
     max_depth: int = 10
     n_estimators: int = 100
+    model_name: str = "alcoholerometer_random_forest"
 
 
 run_config = _RunConfig()

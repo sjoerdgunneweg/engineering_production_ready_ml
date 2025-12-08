@@ -101,3 +101,14 @@ def predict():
     pred_counter.labels(pred="true" if prediction else "false").inc()
     logging.info(f"Prediction complete. Prediction: {prediction}")
     return jsonify(prediction)
+
+
+@app.route("/reload", methods=["POST"])
+def reload():
+    # clear the caches to before reloading to make sure new model and feature extractor are actually new
+    get_model.cache_clear()
+    get_feature_extractor_loaded.cache_clear()
+
+    get_model()
+    get_feature_extractor_loaded()    
+    return "Reloaded Model Successfully", HTTPStatus.OK
