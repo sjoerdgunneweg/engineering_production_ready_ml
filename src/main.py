@@ -9,18 +9,24 @@ from features.feature_extractor import FeatureExtractor
 from random_forest import RandomForestModel
 
 from configs.configs import PathsConfig, run_config, ModelConfig
+from utils.io_utils import read_parquet
 from utils.mlflow_utils import create_mlflow_experiment_if_not_exist, create_mlflow_run_if_not_exists, get_latest_run_id, save_artifacts_to_mlflow
 
 def main(args: argparse.Namespace):
+
+    spark = SparkSession.builder.master("local[*]").config("spark.executor.memory", "8g").config("spark.driver.memory", "8g").getOrCreate()
+
     if args.preprocess:
-        data = get_preprocessed_data() # TODO wrtie to parquet file
+        data = get_preprocessed_data(spark) 
+
         data.write.parquet(PathsConfig.preprocessing_data_path, mode="overwrite")
 
     if args.feat_eng:
-        spark = SparkSession.builder.master(run_config.spark_master_url).getOrCreate()
         data = spark.read.parquet(PathsConfig.preprocessing_data_path)
-        feature_extractor = FeatureExtractor() # TODO implement
+        
+        feature_extractor = FeatureExtractor() 
         data = feature_extractor.get_features(data)
+
         # # TODO check what dthis does
         mlflow.set_tracking_uri(run_config.mlflow_tracking_uri)
         create_mlflow_experiment_if_not_exist()
@@ -29,7 +35,7 @@ def main(args: argparse.Namespace):
         data.write.parquet(PathsConfig.features_data_path, mode="overwrite")
 
     if args.training:
-        spark = SparkSession.builder.master(run_config.spark_master_url).getOrCreate() # TODO maybe make this a function because its used multiple times
+
         data = spark.read.parquet(PathsConfig.features_data_path)
 
         data = data.toPandas()

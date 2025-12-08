@@ -55,7 +55,7 @@ class _FeatureExtractorData: # TODO check this code and know what it does
                 self._window_size_seconds = pickle.load(f)  
 
 
-    def save_to_mlflow(self, run_id: str):  # pragma: no cover
+    def save_to_mlflow(self, run_id: str):  
         """
         Saves the state as an artifact to mlflow, inside the given Run with RunID
 
