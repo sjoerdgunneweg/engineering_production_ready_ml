@@ -43,7 +43,7 @@ class _RunConfig:
     experiment_name: str = "Alcoholerometer_Experiment"
     run_name: str = "alcoholerometer_random_forest_run"
     random_seed: int = 42
-    sample_rate: float = 1.0 
+    sample_rate: float = 0.1 
     num_folds: int = 5 # TODO play with this value
 
 @dataclass(frozen=True)
