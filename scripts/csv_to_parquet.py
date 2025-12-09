@@ -13,6 +13,7 @@ def accelerometer_data_to_parquet(spark, input_path, output_path):
     df.write.parquet(
         output_path, 
         mode="overwrite", 
+        partitionBy=DataConfig.partition_column
     )
     
 def clean_tac_data_to_parquet(spark, input_path, output_path):
@@ -38,11 +39,12 @@ def clean_tac_data_to_parquet(spark, input_path, output_path):
     df_with_id.write.parquet(
         output_path, 
         mode="overwrite", 
+        partitionBy=DataConfig.partition_column
     )
     
 
 def main():
-    spark = SparkSession.builder.master("local[2]").getOrCreate()
+    spark = SparkSession.builder.master("local[4]").getOrCreate()
     
     accelerometer_data_to_parquet(spark, PathsConfig.accelerometer_data_path, PathsConfig.accelerometer_parquet_path)    
     clean_tac_data_to_parquet(spark, PathsConfig.clean_tac_path, PathsConfig.tac_parquet_path)

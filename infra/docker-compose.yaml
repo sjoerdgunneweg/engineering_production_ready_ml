@@ -6,6 +6,10 @@ services:
     depends_on:
       mlflow:
         condition: service_healthy
+    environment: 
+      - SPARK_DRIVER_MEMORY=8g
+      - SPARK_DRIVER_MAXRESULTSIZE=8g
+    mem_limit: 10g # Sets a hard limit on the container's RAM usage
 
   app:
     image: alcoholerometer:latest

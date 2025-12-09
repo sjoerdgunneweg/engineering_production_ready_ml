@@ -20,6 +20,8 @@ def main(args: argparse.Namespace):
     if args.preprocess:
         data = get_preprocessed_data(spark) 
 
+        data = data.repartition(100, "pid")
+
         data.write.parquet(PathsConfig.preprocessing_data_path, mode="overwrite")
 
     if args.feat_eng:

@@ -53,7 +53,8 @@ def _add_tac_reading(data: DataFrame, tac_data: DataFrame) -> DataFrame:
     """
 
     # Partition TAC data by PID and order by timestamp
-    w = Window.partitionBy("pid").orderBy("timestamp").rangeBetween(-sys.maxsize, 0)
+    # w = Window.partitionBy("pid").orderBy("timestamp").rangeBetween(-sys.maxsize, 0)
+    w = Window.partitionBy("pid").orderBy("timestamp")
 
     joined = data.join(tac_data, on="pid", how="left")
 
@@ -80,13 +81,11 @@ def get_preprocessed_data(spark: SparkSession) -> DataFrame:
     data = _timestep_to_seconds(data)
     data = _get_data_windowed(data, time_col="time", window_size_seconds=window_size)
 
-    # Load TAC data
     tac_data = _get_tac_data(spark)
 
-    # Efficiently add TAC readings
+    data = data.sample(run_config.sample_rate, seed=run_config.random_seed)
+
     data = _add_tac_reading(data, tac_data)
 
-    # Optional sampling
-    data = data.sample(run_config.sample_rate, seed=run_config.random_seed)
 
     return data
