@@ -8,7 +8,8 @@ services:
         condition: service_healthy
     environment: 
       - SPARK_DRIVER_MEMORY=8g
-      - SPARK_DRIVER_MAXRESULTSIZE=8g
+      - SPARK_DRIVER_MAXRESULTSIZE=0
+      - SPARK_SQL_SHUFFLE_PARTITIONS=200
     mem_limit: 10g # Sets a hard limit on the container's RAM usage
 
   app:

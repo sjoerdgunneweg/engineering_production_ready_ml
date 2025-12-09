@@ -7,8 +7,7 @@ from pyspark.sql import DataFrame
 from pyspark.sql import SparkSession
 from pyspark.sql.window import Window
 
-from configs.configs import PathsConfig, run_config
-import sys
+from configs.configs import PathsConfig, run_config, DataConfig
 
 
 def _timestep_to_seconds(data: DataFrame) -> DataFrame:
@@ -74,12 +73,19 @@ def get_preprocessed_data(spark: SparkSession) -> DataFrame:
     Loads and preprocesses accelerometer data with TAC readings.
     Returns a DataFrame ready for downstream analysis.
     """
-    window_size = 10  # seconds, could be put in config
 
     # Load accelerometer data
     data = spark.read.parquet(PathsConfig.accelerometer_parquet_path)
+
+
+    data = data.filter(F.col(DataConfig.partition_column).isin(DataConfig.pids_to_use))
+
+
+
+
+
     data = _timestep_to_seconds(data)
-    data = _get_data_windowed(data, time_col="time", window_size_seconds=window_size)
+    data = _get_data_windowed(data, time_col="time", window_size_seconds=DataConfig.window_size_seconds)
 
     tac_data = _get_tac_data(spark)
 
