@@ -9,19 +9,14 @@ from features.feature_extractor import FeatureExtractor
 from random_forest import RandomForestModel
 
 from configs.configs import PathsConfig, run_config, ModelConfig
-from utils.io_utils import read_parquet
 from utils.mlflow_utils import create_mlflow_experiment_if_not_exist, create_mlflow_run_if_not_exists, get_latest_run_id, save_artifacts_to_mlflow
 
 def main(args: argparse.Namespace):
 
-    # spark = SparkSession.builder.master("local[2]").getOrCreate()
     spark = SparkSession.builder.master("local[*]").getOrCreate()
 
     if args.preprocess:
         data = get_preprocessed_data(spark) 
-
-        data = data.repartition(100, "pid")
-
         data.write.parquet(PathsConfig.preprocessing_data_path, mode="overwrite")
 
     if args.feat_eng:
@@ -29,6 +24,7 @@ def main(args: argparse.Namespace):
         
         feature_extractor = FeatureExtractor() 
         data = feature_extractor.get_features(data)
+
 
         # # TODO check what dthis does
         mlflow.set_tracking_uri(run_config.mlflow_tracking_uri)
@@ -40,10 +36,6 @@ def main(args: argparse.Namespace):
     if args.training:
 
         data = spark.read.parquet(PathsConfig.features_data_path).toPandas()
-
-        print(data['TAC_reading'].notna())
-        
-        print(data.head())
 
         random_forest_model = RandomForestModel() 
         random_forest_model.train_model(data)

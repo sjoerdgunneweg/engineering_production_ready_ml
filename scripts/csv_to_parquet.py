@@ -2,8 +2,13 @@ import os
 from pyspark.sql import SparkSession
 from pyspark.sql import functions as F
 from configs.configs import DataConfig, PathsConfig
+from pyspark.sql.window import Window
+from pyspark.sql import DataFrame
 
-def accelerometer_data_to_parquet(spark, input_path, output_path):
+import pandas as pd
+import numpy as np
+
+def accelerometer_data_to_parquet(spark, input_path, output_path) -> None:
     """
     Reads the single Accelerometer CSV file, converts the Unix timestamp, 
     and writes to Parquet, partitioned by 'pid'.
@@ -16,7 +21,7 @@ def accelerometer_data_to_parquet(spark, input_path, output_path):
         partitionBy=DataConfig.partition_column
     )
     
-def clean_tac_data_to_parquet(spark, input_path, output_path):
+def clean_tac_data_to_parquet(spark, input_path, output_path) -> None:
     """
     Reads multiple TAC CSV files from a folder, derives 'pid' from filename,
     converts the Unix timestamp, and writes to Parquet, partitioned by 'pid'.
@@ -41,7 +46,6 @@ def clean_tac_data_to_parquet(spark, input_path, output_path):
         mode="overwrite", 
         partitionBy=DataConfig.partition_column
     )
-    
 
 def main():
     spark = SparkSession.builder.master("local[4]").getOrCreate()
@@ -50,8 +54,6 @@ def main():
     clean_tac_data_to_parquet(spark, PathsConfig.clean_tac_path, PathsConfig.tac_parquet_path)
     
     spark.stop()
-    print("CSV to Parquet conversion completed.")
-
 
 if __name__ == "__main__":
     main()

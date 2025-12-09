@@ -51,8 +51,6 @@ def _add_tac_reading(data: DataFrame, tac_data: DataFrame) -> DataFrame:
     Works like the Pandas get_tac_value function: finds the nearest TAC timestamp <= accel time.
     """
 
-    # Partition TAC data by PID and order by timestamp
-    # w = Window.partitionBy("pid").orderBy("timestamp").rangeBetween(-sys.maxsize, 0)
     w = Window.partitionBy("pid").orderBy("timestamp")
 
     joined = data.join(tac_data, on="pid", how="left")
@@ -75,23 +73,22 @@ def get_preprocessed_data(spark: SparkSession) -> DataFrame:
     """
 
     # Load accelerometer data
-    data = spark.read.parquet(PathsConfig.accelerometer_parquet_path)
+    data = spark.read.parquet(PathsConfig.accelerometer_with_tac_parquet_path)
+
+    
 
 
-    data = data.filter(F.col(DataConfig.partition_column).isin(DataConfig.pids_to_use))
+    # data = data.filter(F.col(DataConfig.partition_column).isin(pid_list))
 
 
+    # data = _timestep_to_seconds(data)
+    # data = _get_data_windowed(data, time_col=DataConfig.acceleleration_time_column, window_size_seconds=DataConfig.window_size_seconds)
 
+    # tac_data = _get_tac_data(spark)
 
+    # data = data.sample(run_config.sample_rate, seed=run_config.random_seed)
 
-    data = _timestep_to_seconds(data)
-    data = _get_data_windowed(data, time_col="time", window_size_seconds=DataConfig.window_size_seconds)
-
-    tac_data = _get_tac_data(spark)
-
-    data = data.sample(run_config.sample_rate, seed=run_config.random_seed)
-
-    data = _add_tac_reading(data, tac_data)
+    # data = _add_tac_reading(data, tac_data)
 
 
     return data

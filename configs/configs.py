@@ -7,6 +7,7 @@ class PathsConfig:
 
     accelerometer_parquet_path: str = "data/accelerometer/"
     tac_parquet_path: str = "data/tac/"
+    accelerometer_with_tac_parquet_path: str = "data/accelerometer_with_tac/"
 
     telemetry_training_data_path: str = "data/telemetry/data_dist.json" # TODO change to better path
     telemetry_live_data_path: str = "data/telemetry/live_data_dist.json" # TODO change to better path
@@ -19,13 +20,15 @@ class DataConfig:
     acceleleration_time_column: str = "time"
     tac_time_column: str = "timestamp"
     partition_column: str = "pid"
+    tac_reading_column = "TAC_Reading"
 
     tac_time_column: str = "timestamp"
 
     window_size_seconds: int = 10
-    pids_to_use: list[str] = field(default_factory=lambda: [
-        "BK7610", "BU4707", "CC6740"
-    ])
+    pids_to_use: str = "BK7610"
+    # pids_to_use: list[str] = field(default_factory=lambda: [
+    #     "BK7610", "BU4707", "CC6740"
+    # ])
 
     
 

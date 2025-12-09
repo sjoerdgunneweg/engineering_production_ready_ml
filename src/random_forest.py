@@ -20,7 +20,8 @@ class RandomForestModel:
     
     @staticmethod # TODO wat doet dit?
     def _get_x_y(data: pd.DataFrame) -> tuple[pd.DataFrame, pd.Series]:
-        return data.drop("is_intoxicated", axis=1), data["is_intoxicated"] # TODO maybe in configs
+        data = data.drop("pid", axis=1) # TODO maybe put this during grabbijng the features, it is a str but the model does not accept it
+        return data.drop("is_intoxicated", axis=1), data["is_intoxicated"].astype(bool) # TODO maybe in configs
 
     def train_model(self, data) -> None:
         x, y = self._get_x_y(data)
