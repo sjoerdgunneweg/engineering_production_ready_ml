@@ -8,20 +8,9 @@ def accelerometer_data_to_parquet(spark, input_path, output_path):
     Reads the single Accelerometer CSV file, converts the Unix timestamp, 
     and writes to Parquet, partitioned by 'pid'.
     """
-    df = spark.read.csv(input_path, header=True, inferSchema=True)
+    df = spark.read.csv(input_path, header=True, inferSchema=True)   
 
-    time_column_in_seconds = F.col(DataConfig.acceleleration_time_column).cast("double") / 1000 # convert ms to s
-
-    # TODO i dont think i really need both readable_time and measurement_date
-    df_processed = df.withColumn( # TODO dit in een functie die dan in utils komt? hij is er 2 keer 
-        "readable_time", 
-        F.from_unixtime(time_column_in_seconds)
-    ).withColumn(
-        "measurement_date",
-        F.to_date(F.from_unixtime(time_column_in_seconds))
-    )    
-
-    df_processed.write.parquet(
+    df.write.parquet(
         output_path, 
         mode="overwrite", 
     )
@@ -45,17 +34,8 @@ def clean_tac_data_to_parquet(spark, input_path, output_path):
         F.regexp_extract(F.input_file_name(), r'([A-Z]{2}\d{4})', 1) # regex finding pid pattern like 'AB1234'
     )
     
-    # convert unix timestamp
-        # TODO i dont think i really need both readable_time and measurement_date
-    df_processed = df_with_id.withColumn(
-        "readable_time", 
-        F.from_unixtime(F.col(DataConfig.tac_time_column))
-    ).withColumn(
-        "measurement_date",
-        F.to_date(F.from_unixtime(F.col(DataConfig.tac_time_column)))
-    )
 
-    df_processed.write.parquet(
+    df_with_id.write.parquet(
         output_path, 
         mode="overwrite", 
     )

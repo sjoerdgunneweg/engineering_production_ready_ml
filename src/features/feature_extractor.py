@@ -84,32 +84,16 @@ class FeatureExtractor:
         data = self._get_energy(data)
         # data = self._get_mean_energy(data) 
         data = self._get_magnitude(data)
+        data = self._get_is_intoxicated(data, threshold=run_config.intoxication_threshold)
 
         return data  # TODO maybe implement inference and training seperately?
     
-    def _get_last_tac_given_time(self, data: DataFrame, pid: str, timestamp: int) -> float: # TODO maybe in preprocessing?
-        """
-        Get the last TAC reading before a given timestamp for a patient
-
-        returns: float: the last TAC reading
-        """
-
-        pid_df = data[pid]
-        
-        closest_idx = np.argmax(pid_df['timestamp'] > timestamp)
-
-        if closest_idx != 0: # adjust index iff not the first element
-            closest_idx -= 1
-
-        return pid_df.at[closest_idx, 'TAC_Reading'] # retrieves the TAC reading at the closest index
-    
-
-    def _is_intoxicated(self, tac_reading: float, threshold: float) -> bool: # TODO apply this as extra feature maybe use as label?
-        return tac_reading >= threshold
+    def _get_is_intoxicated(self, data: DataFrame, threshold: float) -> DataFrame:
+        return data.withColumn("is_intoxicated", F.col("TAC_Reading") >= threshold)
     
 
     # TODO maybe an is night feature?
-    def _time_of_day_feature(self, timestamp: int) -> str:
+    def _get_time_of_day(self, timestamp: int) -> str:
         """
         Extract time of day feature from timestamp
 

@@ -15,7 +15,7 @@ from utils.mlflow_utils import create_mlflow_experiment_if_not_exist, create_mlf
 def main(args: argparse.Namespace):
 
     # spark = SparkSession.builder.master("local[2]").getOrCreate()
-    spark = SparkSession.builder.master("local[2]").getOrCreate()
+    spark = SparkSession.builder.master("local[*]").getOrCreate()
 
     if args.preprocess:
         data = get_preprocessed_data(spark) 
@@ -38,6 +38,10 @@ def main(args: argparse.Namespace):
     if args.training:
 
         data = spark.read.parquet(PathsConfig.features_data_path).toPandas()
+
+        print(data['TAC_reading'].notna())
+        
+        print(data.head())
 
         random_forest_model = RandomForestModel() 
         random_forest_model.train_model(data)

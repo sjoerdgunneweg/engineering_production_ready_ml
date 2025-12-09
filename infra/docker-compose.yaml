@@ -6,10 +6,6 @@ services:
     depends_on:
       mlflow:
         condition: service_healthy
-    deploy:
-      resources:
-        limits:
-          memory: 9g
 
   app:
     image: alcoholerometer:latest

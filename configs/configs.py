@@ -28,7 +28,7 @@ class DataConfig:
         "PC6771", "SA0297", "SF3079"
     ])
 
-    intoxication_threshold: float = 0.08  # TODO find source, but maybe also not in right config
+    
 
 @dataclass(frozen=True)
 class _RunConfig:
@@ -45,6 +45,7 @@ class _RunConfig:
     random_seed: int = 42
     sample_rate: float = 0.1 
     num_folds: int = 5 # TODO play with this value
+    intoxication_threshold: float = 0.08  # TODO find source, but maybe also not in right config
 
 @dataclass(frozen=True)
 class TelemetryConfig: # TODO alter to my style

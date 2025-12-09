@@ -20,14 +20,7 @@ class RandomForestModel:
     
     @staticmethod # TODO wat doet dit?
     def _get_x_y(data: pd.DataFrame) -> tuple[pd.DataFrame, pd.Series]:
-        # return data.drop("TAC_Reading", axis=1), data["TAC_Reading"] # TODO maybe in configs
-        # return data.drop("TAC_Reading"), data["TAC_Reading"] # TODO maybe in configs   
-        # 
-
-        data.drop("readable_time", axis=1, inplace=True) # TODO remove this or find better fix
-        data.drop("measurement_date", axis=1, inplace=True) # TODO remove this or find better fix
-        return data.drop("pid", axis=1), data["pid"]
-
+        return data.drop("is_intoxicated", axis=1), data["is_intoxicated"] # TODO maybe in configs
 
     def train_model(self, data) -> None:
         x, y = self._get_x_y(data)
