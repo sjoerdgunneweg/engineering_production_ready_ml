@@ -62,7 +62,5 @@ class RandomForestModel:
             with open(artifacts_path + "/" + model_file_name, "rb") as file:
                 self._model = pickle.load(file)
 
-    def predict(self, features: pd.DataFrame) -> pd.DataFrame: # TODO moet dit soort shit niet pysspark?
-        logging.info(features.head().to_string()) # TODO remove
-        print(features.head(), flush=True)
+    def predict(self, features: pd.DataFrame) -> pd.DataFrame:
         return self._model.predict(features)

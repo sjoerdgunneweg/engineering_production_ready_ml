@@ -1,17 +1,5 @@
 services:
 
-  training:
-    image: alcoholerometer:latest
-    command: python src/main.py --preprocess --feat_eng --training
-    depends_on:
-      mlflow:
-        condition: service_healthy
-    environment: 
-      - SPARK_DRIVER_MEMORY=8g
-      - SPARK_DRIVER_MAXRESULTSIZE=0
-      - SPARK_SQL_SHUFFLE_PARTITIONS=200
-    mem_limit: 10g # Sets a hard limit on the container's RAM usage TODO check if this much ram is needed
-
   app:
     image: alcoholerometer:latest
     command: flask --app src/api run --host 0.0.0.0 --port 5001
@@ -22,9 +10,9 @@ services:
         condition: service_healthy
       telemetry_job:
         condition: service_started
-      training:
-        condition: service_completed_successfully
       grafana:
+        condition: service_healthy
+      airflow:
         condition: service_healthy
     ports:
       - "5001:5001"  # see: https://developer.apple.com/forums/thread/682332
@@ -87,7 +75,6 @@ services:
       test: wget http://localhost:8080/api/v2/monitor/health -o /dev/null || exit 1  # note: wget downloads the file. I do not need it. So we move it to /dev/null
       retries: 3
       interval: 5s
-
 
   grafana:
     image: grafana/grafana:latest

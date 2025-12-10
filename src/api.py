@@ -89,6 +89,17 @@ def predict():
     features = feature_extractor.get_features(request_data)
     features = features.toPandas()
 
+    EXPECTED_TRAINING_ORDER = [ # TODO check if this is needed
+        "time",
+        "x",
+        "y",
+        "z",
+        "TAC_Reading",
+        "energy",
+        "magnitude",
+    ]
+    features = features.reindex(columns=EXPECTED_TRAINING_ORDER)
+
     features = features.drop(columns=["pid", "is_intoxicated"], errors='ignore') # TODO if this line sovles the issue, make a seperet get_features for inference and training in feature extractor
 
     logging.info("Features are ready. Calculating prediction.")
