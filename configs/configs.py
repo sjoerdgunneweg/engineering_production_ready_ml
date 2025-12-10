@@ -9,7 +9,7 @@ class PathsConfig:
     tac_parquet_path: str = "data/tac/"
     accelerometer_with_tac_parquet_path: str = "data/accelerometer_with_tac/"
 
-    telemetry_training_data_path: str = "data/telemetry/data_dist.json" # TODO change to better path
+    telemetry_training_data_path: str = "data/telemetry/data_dist.json" 
     telemetry_live_data_path: str = "data/telemetry/live_data_dist.json" # TODO change to better path
 
     preprocessing_data_path: str = "data/processed/preprocessed_data.parquet"
@@ -71,7 +71,10 @@ class TelemetryConfig: # TODO alter to my style
     num_instances_for_live_dist: int = 3
     epsilon: float = 1 / 1e100
     push_gateway_uri: str = "http://prometheus_push_gateway:9091" # "http://localhost:9091"
-
+    targets: tuple[str, ...] = ("is_intoxicated",)
+    # targets: list[str] = field(default_factory=lambda: [
+    #     "is_intoxicated"
+    # ])
 
 @dataclass(init=False, frozen=True)
 class ModelConfig:

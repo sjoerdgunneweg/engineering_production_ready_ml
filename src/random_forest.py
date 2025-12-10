@@ -1,6 +1,7 @@
 import os
 import pickle
 import tempfile
+import logging
 
 import mlflow
 import pandas as pd
@@ -25,6 +26,8 @@ class RandomForestModel:
 
     def train_model(self, data) -> None:
         x, y = self._get_x_y(data)
+        print(x.head()) # TODO remove prints
+        print(" daarboven is x")
         classifier = self._get_model()
         self._cv_scores = cross_validate( # TODO check which parameters are needed
             classifier,
@@ -60,4 +63,6 @@ class RandomForestModel:
                 self._model = pickle.load(file)
 
     def predict(self, features: pd.DataFrame) -> pd.DataFrame: # TODO moet dit soort shit niet pysspark?
+        logging.info(features.head().to_string()) # TODO remove
+        print(features.head(), flush=True)
         return self._model.predict(features)

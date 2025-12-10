@@ -14,3 +14,7 @@ build:
 up: build
 	docker compose --file infra/docker-compose.yaml down
 	docker compose --file infra/docker-compose.yaml up app
+
+.PHONY: logs
+logs:
+	docker compose -f infra/docker-compose.yaml logs -f app

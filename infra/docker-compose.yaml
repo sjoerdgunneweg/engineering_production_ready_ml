@@ -10,7 +10,7 @@ services:
       - SPARK_DRIVER_MEMORY=8g
       - SPARK_DRIVER_MAXRESULTSIZE=0
       - SPARK_SQL_SHUFFLE_PARTITIONS=200
-    mem_limit: 10g # Sets a hard limit on the container's RAM usage
+    mem_limit: 10g # Sets a hard limit on the container's RAM usage TODO check if this much ram is needed
 
   app:
     image: alcoholerometer:latest
@@ -24,6 +24,8 @@ services:
         condition: service_started
       training:
         condition: service_completed_successfully
+      grafana:
+        condition: service_healthy
     ports:
       - "5001:5001"  # see: https://developer.apple.com/forums/thread/682332
     healthcheck:
@@ -85,3 +87,22 @@ services:
       test: wget http://localhost:8080/api/v2/monitor/health -o /dev/null || exit 1  # note: wget downloads the file. I do not need it. So we move it to /dev/null
       retries: 3
       interval: 5s
+
+
+  grafana:
+    image: grafana/grafana:latest
+    depends_on:
+      - prometheus
+    volumes:
+      - ./grafana/data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_SECURITY_ADMIN_PASSWORD=password
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000/login"]
+      interval: 30s
+      timeout: 5s
+      retries: 5

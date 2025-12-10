@@ -56,3 +56,6 @@ def save_artifacts_to_mlflow(artifacts: dict[str, typing.Any], run_id: str):
             with open(artifact_path, "wb") as f:
                 pickle.dump(artifact, f)
                 mlflow.log_artifact(artifact_path, f"{run_config.run_name}", run_id)
+
+
+#TODO log accuracy, precision, recall, f1 to mlflow 

@@ -41,7 +41,7 @@ SparkSession.builder.master(run_config.spark_master_url).getOrCreate()
 
 logger.info("Starting flask app.")
 app = Flask(__name__)
-metrics = PrometheusMetrics(app, defaults_prefix=run_config.app_name)
+metrics = PrometheusMetrics(app, defaults_prefix=run_config.app_name) # TODO kijk of dit goed werkt in prometheus
 metrics.info(
     f"{run_config.app_name}_model_version",
     "Model version information",
@@ -75,8 +75,10 @@ def predict():
     request_data = spark.createDataFrame(
         [
             {
-                # Use the correct columns for the alcoholerometer project
-                "pid": request.json["pid"],
+                "TAC_Reading": request.json["TAC_Reading"],
+                "energy": request.json["energy"],
+                "magnitude": request.json["magnitude"],
+                "time": request.json["time"],
                 "x": request.json["x"],
                 "y": request.json["y"],
                 "z": request.json["z"],

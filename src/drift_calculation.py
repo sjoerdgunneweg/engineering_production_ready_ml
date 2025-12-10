@@ -42,7 +42,7 @@ def main():  # pragma: no cover
         exit(0)
 
     psi_s = {}
-    for target in ["is_large_transaction", "is_fraud"]: # TODO alter to my targets 
+    for target in TelemetryConfig.targets:
         training_count = training_telemetry_data[target]["true"] + training_telemetry_data[target]["false"]
         # Adding Epsilon to avoid division by zero err for when there is no instance of a category.
         training_percentages = (
@@ -66,7 +66,7 @@ def main():  # pragma: no cover
         labelnames=["target"],
         registry=registry,
     )
-    for target in ["is_intoxicated"]:
+    for target in TelemetryConfig.targets:
         psi_gauge.labels(target=target).set(psi_s[target])
 
     push_to_gateway(TelemetryConfig.push_gateway_uri, job="telemetryBatch", registry=registry)

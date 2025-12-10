@@ -1,5 +1,7 @@
 import argparse
 import mlflow
+import json
+
 from data.data_preprocessing import get_preprocessed_data
 from mlflow.entities import RunStatus
 
@@ -51,15 +53,16 @@ def main(args: argparse.Namespace):
         )
         mlflow.end_run(RunStatus.to_string(RunStatus.FINISHED))
 
-        # telemetry_data = { # TODO
-        #     "is_large_transaction": {
-        #         False: sum(data["is_large_transaction"] == False),
-        #         True: sum(data["is_large_transaction"] == True),
-        #     },
-        #     "is_fraud": {False: sum(data["fraud"] == False), True: sum(data["fraud"] == True)},
-        # }
-        # with open(PathsConfig.telemetry_training_data_path, "w") as file:
-        #     json.dump(telemetry_data, file)
+        telemetry_data = {
+            "is_intoxicated": {
+                False: sum(data["is_intoxicated"] == False),
+                True: sum(data["is_intoxicated"] == True),
+            }
+        }
+        print(telemetry_data)
+        with open(PathsConfig.telemetry_training_data_path, "w") as file:
+            json.dump(telemetry_data, file)
+            print(f"Written telemetry training data to: {PathsConfig.telemetry_training_data_path}")
 
 
 if __name__ == "__main__":
