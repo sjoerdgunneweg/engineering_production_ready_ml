@@ -12,8 +12,8 @@ build:
 
 .PHONY: up
 up: build
-	docker compose --file infra/docker-compose.yaml down
-	docker compose --file infra/docker-compose.yaml up app
+	docker compose --file infra/docker-compose.yaml down -v
+	docker compose -f infra/docker-compose.yaml up --remove-orphans
 
 .PHONY: logs
 logs:

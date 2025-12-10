@@ -13,9 +13,9 @@ services:
       grafana:
         condition: service_healthy
       airflow:
-        condition: service_healthy
+        condition: service_healthy 
     ports:
-      - "5001:5001"  # see: https://developer.apple.com/forums/thread/682332
+      - "5001:5001"  
     healthcheck:
       test: apt-get update -y && apt-get install -y curl && curl --fail http://localhost:5001/health || exit 1
       retries: 5
@@ -75,6 +75,15 @@ services:
       test: wget http://localhost:8080/api/v2/monitor/health -o /dev/null || exit 1  # note: wget downloads the file. I do not need it. So we move it to /dev/null
       retries: 3
       interval: 5s
+
+  # init_airflow:
+  #   image: apache/airflow:3.1.0-python3.10
+  #   depends_on:
+  #     airflow:
+  #       condition: service_healthy
+  #   entrypoint: ["bash", "-c"]
+  #   command: >
+  #     sh -c "airflow dags trigger alcoholerometer_training"
 
   grafana:
     image: grafana/grafana:latest

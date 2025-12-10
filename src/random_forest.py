@@ -22,12 +22,11 @@ class RandomForestModel:
     @staticmethod # TODO wat doet dit?
     def _get_x_y(data: pd.DataFrame) -> tuple[pd.DataFrame, pd.Series]:
         data = data.drop("pid", axis=1) # TODO maybe put this during grabbijng the features, it is a str but the model does not accept it
+        data = data.drop("TAC_Reading", axis=1) # could be considered as label leakage
         return data.drop("is_intoxicated", axis=1), data["is_intoxicated"].astype(bool) # TODO maybe in configs
 
     def train_model(self, data) -> None:
         x, y = self._get_x_y(data)
-        print(x.head()) # TODO remove prints
-        print(" daarboven is x")
         classifier = self._get_model()
         self._cv_scores = cross_validate( # TODO check which parameters are needed
             classifier,

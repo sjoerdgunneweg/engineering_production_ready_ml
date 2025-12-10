@@ -1,14 +1,11 @@
-import pendulum
 
 from airflow import DAG
 from docker.types import Mount
 from airflow.operators.bash import BashOperator
 from airflow.providers.docker.operators.docker import DockerOperator
 
-from datetime import datetime
 from datetime import timedelta
 
-local_timezone = pendulum.timezone("Europe/Amsterdam")
 
 default_args = {
     "depends_on_past": False,
@@ -16,11 +13,7 @@ default_args = {
     "retry_delay": timedelta(minutes=1),
 }
 
-dag = DAG("alcoholerometer_training", 
-          default_args=default_args, 
-          schedule="59 23 * * *", # every day at 23:59 --> @daily starts at 24:00
-          start_date=datetime(2025, 11, 28, tzinfo=local_timezone), 
-          catchup=False) 
+dag = DAG("alcoholerometer_training", default_args=default_args) 
 
 preprocessing_task = DockerOperator(
     docker_url="unix://var/run/docker.sock",

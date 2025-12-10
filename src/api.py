@@ -75,13 +75,13 @@ def predict():
     request_data = spark.createDataFrame(
         [
             {
-                "TAC_Reading": request.json["TAC_Reading"],
-                "energy": request.json["energy"],
-                "magnitude": request.json["magnitude"],
                 "time": request.json["time"],
                 "x": request.json["x"],
                 "y": request.json["y"],
                 "z": request.json["z"],
+                "TAC_Reading": request.json["TAC_Reading"],
+                "energy": request.json["energy"],
+                "magnitude": request.json["magnitude"],
             },
         ]
     )
@@ -100,7 +100,7 @@ def predict():
     ]
     features = features.reindex(columns=EXPECTED_TRAINING_ORDER)
 
-    features = features.drop(columns=["pid", "is_intoxicated"], errors='ignore') # TODO if this line sovles the issue, make a seperet get_features for inference and training in feature extractor
+    features = features.drop(columns=["pid", "is_intoxicated", "TAC_Reading"], errors='ignore') # TODO if this line sovles the issue, make a seperet get_features for inference and training in feature extractor
 
     logging.info("Features are ready. Calculating prediction.")
     prediction = model.predict(features)[0].item()
