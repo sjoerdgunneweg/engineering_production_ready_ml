@@ -1,6 +1,5 @@
 from functools import cache
 import logging
-from unicodedata import category
 
 import mlflow
 from http import HTTPStatus
@@ -35,8 +34,6 @@ def get_feature_extractor_loaded() -> FeatureExtractor:
     return feature_extractor
 
 
-# Doing "starting up tasks" like loading the model and feature extractor to cache before the app is started.
-# So that the first request wont have a big latency spike.
 logger.info("Loading cache and starting spark session.")
 get_model()
 get_feature_extractor_loaded()
@@ -53,7 +50,7 @@ metrics.info(
     model_name=ModelConfig.model_name,
 )
 
-pred_counter = Counter(f"{run_config.app_name}_predictions", "Count of predictions by class", labelnames=["pred"])
+pred_counter = Counter(f"{run_config.app_name}_predictions", "Count of predictions by class", labelnames=["pred"]) # TODO what does this do?
 data_quality_counter = Counter(
     f"{run_config.app_name}_data_quality", "Count of data quality issues", labelnames=["quality_rule"]
 )
@@ -70,22 +67,19 @@ def health():
 def predict():
     logging.info("Received prediction request at /predict.")
     model = get_model()
+    print(model)
+    print("Model loaded successfully.")
     feature_extractor = get_feature_extractor_loaded()
     spark = SparkSession.builder.master(run_config.spark_master_url).getOrCreate()
-
-    if request.json["amount"] < 0:
-        logging.warning("Received negative amount in request.")
-        data_quality_counter.labels(quality_rule="neg_amount").inc()
-    if category_received := request.json["category"] not in feature_extractor.get_known_categories():
-        logging.error(f"Received unknown category in request: {category_received}.")
-        data_quality_counter.labels(quality_rule="unknown_category").inc()
 
     request_data = spark.createDataFrame(
         [
             {
-                "amount": request.json["amount"],
-                "category": request.json["category"],
-                "payment_type": request.json["payment_type"],
+                # Use the correct columns for the alcoholerometer project
+                "pid": request.json["pid"],
+                "x": request.json["x"],
+                "y": request.json["y"],
+                "z": request.json["z"],
             },
         ]
     )
@@ -93,8 +87,7 @@ def predict():
     features = feature_extractor.get_features(request_data)
     features = features.toPandas()
 
-    # for col_name in ["enc_category", "enc_payment_type"]: # TODO do something like this
-    #     features = get_nested_column_extended(features, col_name)
+    features = features.drop(columns=["pid", "is_intoxicated"], errors='ignore') # TODO if this line sovles the issue, make a seperet get_features for inference and training in feature extractor
 
     logging.info("Features are ready. Calculating prediction.")
     prediction = model.predict(features)[0].item()

@@ -20,8 +20,8 @@ services:
         condition: service_healthy
       prometheus:
         condition: service_healthy
-      # telemetry_job:
-      #   condition: service_started
+      telemetry_job:
+        condition: service_started
       training:
         condition: service_completed_successfully
     ports:
@@ -64,11 +64,11 @@ services:
       retries: 3
       interval: 5s
 
-  # telemetry_job: TODO enable once drift calculation is implemented
-  #   image: alcoholerometer:latest
-  #   command: ["/bin/sh", "-c", "while true; do sleep 10; python src/drift_calculation.py ; done"]
-  #   depends_on:
-  #     - prometheus
+  telemetry_job: 
+    image: alcoholerometer:latest
+    command: ["/bin/sh", "-c", "while true; do sleep 10; python src/drift_calculation.py ; done"]
+    depends_on:
+      - prometheus
 
   airflow:
     image: apache/airflow:3.1.0-python3.10

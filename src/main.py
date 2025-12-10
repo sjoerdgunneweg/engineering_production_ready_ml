@@ -39,6 +39,7 @@ def main(args: argparse.Namespace):
 
         random_forest_model = RandomForestModel() 
         random_forest_model.train_model(data)
+        print(random_forest_model.get_cv_scores()) # TODO maybe log this?
 
         # TODO implement something similar
         mlflow.set_tracking_uri(run_config.mlflow_tracking_uri)
@@ -50,10 +51,15 @@ def main(args: argparse.Namespace):
         )
         mlflow.end_run(RunStatus.to_string(RunStatus.FINISHED))
 
-    if args.reload: # TODO is this correct way to do it?
-        # This part would ideally send a request to the running API to reload the model.
-        # For simplicity, we will just print a message here.
-        print("Model reload requested. Please implement the API call to trigger model reload.")
+        # telemetry_data = { # TODO
+        #     "is_large_transaction": {
+        #         False: sum(data["is_large_transaction"] == False),
+        #         True: sum(data["is_large_transaction"] == True),
+        #     },
+        #     "is_fraud": {False: sum(data["fraud"] == False), True: sum(data["fraud"] == True)},
+        # }
+        # with open(PathsConfig.telemetry_training_data_path, "w") as file:
+        #     json.dump(telemetry_data, file)
 
 
 if __name__ == "__main__":

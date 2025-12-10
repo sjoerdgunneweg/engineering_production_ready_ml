@@ -2,7 +2,7 @@ from dataclasses import dataclass, field
 
 @dataclass(init=False, frozen=True)
 class PathsConfig:
-    clean_tac_path: str = "data/bar+crawl+detecting+heavy+drinking/data/clean_tac/" # TODO fix to better data paths? now have data in data
+    clean_tac_path: str = "data/bar+crawl+detecting+heavy+drinking/data/clean_tac/"
     accelerometer_data_path: str = "data/bar+crawl+detecting+heavy+drinking/data/all_accelerometer_data_pids_13.csv"
 
     accelerometer_parquet_path: str = "data/accelerometer/"
@@ -47,7 +47,7 @@ class _RunConfig:
     random_seed: int = 42
     sample_rate: float = 0.1 
     num_folds: int = 5 # TODO play with this value
-    intoxication_threshold: float = 0.08  # TODO find source, but maybe also not in right config
+    intoxication_threshold: float = 0.08  
 
 @dataclass(frozen=True)
 class TelemetryConfig: # TODO alter to my style

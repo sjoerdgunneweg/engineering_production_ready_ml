@@ -18,18 +18,28 @@ class _FeatureExtractorData: # TODO check this code and know what it does
     Class for holding the data for FeatureExtractor
     """
     def __init__(self): # TODO
-        self._mean_per_feature: typing.Optional[dict[str, float]] = {}
-        self._std_per_feature: typing.Optional[dict[str, float]] = {}
-        self._window_size_seconds: typing.Optional[float] = None
+        self._mean_energy: typing.Optional[dict[str, float]] = {}
+        self._std_energy: typing.Optional[dict[str, float]] = {}
+        self._mean_magnitude: typing.Optional[dict[str, float]] = {}
+        self._std_magnitude: typing.Optional[dict[str, float]] = {}
 
+        self._is_trained: bool = False
+
+    def is_trained(self) -> bool: # TODO replace by die set ding
+        return self._is_trained
+    
+    def is_set(self) -> bool: # TODO maak keuze tussen deze en is trained
+        return True if None not in self.__getstate__().values() and {} not in self.__getstate__().values() else False
 
     def save(self, directory_path: str):
-        with open(os.path.join(directory_path, "mean_per_feature.pkl"), "wb") as f:
-            pickle.dump(self._mean_per_feature, f)
-        with open(os.path.join(directory_path, "std_per_feature.pkl"), "wb") as f:
-            pickle.dump(self._std_per_feature, f)
-        with open(os.path.join(directory_path, "window_size_seconds.pkl"), "wb") as f:
-            pickle.dump(self._window_size_seconds, f)
+        with open(os.path.join(directory_path, "mean_energy.pkl"), "wb") as f:
+            pickle.dump(self._mean_energy, f)
+        with open(os.path.join(directory_path, "std_energy.pkl"), "wb") as f:
+            pickle.dump(self._std_energy, f)
+        with open(os.path.join(directory_path, "mean_magnitude.pkl"), "wb") as f:
+            pickle.dump(self._mean_magnitude, f)
+        with open(os.path.join(directory_path, "std_magnitude.pkl"), "wb") as f:
+            pickle.dump(self._std_magnitude, f)
 
     def load_from_mlflow(self, run_id: str):  # pragma: no cover
         """
@@ -46,14 +56,18 @@ class _FeatureExtractorData: # TODO check this code and know what it does
                 raise RuntimeError(f"Experiment {run_config.experiment_name} does not exist in MLFlow.")
             mlflow.artifacts.download_artifacts(run_id=run_id, artifact_path=run_config.run_name, dst_path=dir_name)
 
+            # mlflow.artifacts.download_artifacts(run_id=run_id, dst_path=dir_name) # TODO kijk hier naar 
+            artifacts_path = os.path.join(dir_name, run_config.run_name)
 
-            with open(os.path.join(dir_name, "mean_per_feature.pkl"), "rb") as f:
-                self._mean_per_feature = pickle.load(f)
-            with open(os.path.join(dir_name, "std_per_feature.pkl"), "rb") as f:
-                self._std_per_feature = pickle.load(f)
-            with open(os.path.join(dir_name, "window_size_seconds.pkl"), "rb") as f:
-                self._window_size_seconds = pickle.load(f)  
 
+            with open(os.path.join(artifacts_path, "mean_energy.pkl"), "rb") as f:
+                self._mean_energy = pickle.load(f)
+            with open(os.path.join(artifacts_path, "std_energy.pkl"), "rb") as f:
+                self._std_energy = pickle.load(f) 
+            with open(os.path.join(artifacts_path, "mean_magnitude.pkl"), "rb") as f:
+                self._mean_magnitude = pickle.load(f)
+            with open(os.path.join(artifacts_path, "std_magnitude.pkl"), "rb") as f:
+                self._std_magnitude = pickle.load(f)
 
     def save_to_mlflow(self, run_id: str):  
         """
@@ -72,28 +86,51 @@ class _FeatureExtractorData: # TODO check this code and know what it does
         
 class FeatureExtractor:
     def __init__(self):
-        self._data = _FeatureExtractorData()
+        self._state = _FeatureExtractorData()
     
     def save_to_mlflow(self, run_id: str):
-        self._data.save_to_mlflow(run_id)
+        self._state.save_to_mlflow(run_id)
 
     def load_from_mlflow(self, run_id: str):
-        self._data.load_from_mlflow(run_id)
+        self._state.load_from_mlflow(run_id)
 
     def get_features(self, data: DataFrame) -> DataFrame:
+        is_inference_time = self._state.is_set()
+        return self.get_inference_features(data) if is_inference_time else self.get_training_features(data)
+    
+    def get_training_features(self, data: DataFrame) -> DataFrame: # TODO sla de features op in mlflow want daarna werkt die is set ding van hem wel 
+
         data = self._get_energy(data)
-        # data = self._get_mean_energy(data) 
         data = self._get_magnitude(data)
         data = self._get_is_intoxicated(data, threshold=run_config.intoxication_threshold)
 
-        return data  # TODO maybe implement inference and training seperately?
+        # TODO meer met clean coding dit doen!
+        self._set_mean_energy(
+            data.select(F.mean(F.col("energy"))).collect()[0][0], data.select(F.std(F.col("energy"))).collect()[0][0]
+        )
+        self._set_mean_magnitude(
+            data.select(F.mean(F.col("magnitude"))).collect()[0][0], data.select(F.std(F.col("magnitude"))).collect()[0][0]
+        )
+        self._set_std_energy(
+            data.select(F.std(F.col("energy"))).collect()[0][0], data.select(F.std(F.col("energy"))).collect()[0][0]
+        )
+        self._set_std_magnitude(
+            data.select(F.std(F.col("magnitude"))).collect()[0][0], data.select(F.std(F.col("magnitude"))).collect()[0][0]
+        )
+
+        return data
+    
+    def get_inference_features(self, data: DataFrame) -> DataFrame:
+        data = self._get_energy(data)
+        data = self._get_magnitude(data)
+        return data
     
     def _get_is_intoxicated(self, data: DataFrame, threshold: float) -> DataFrame:
         return data.withColumn("is_intoxicated", F.col("TAC_Reading") >= threshold)
     
 
     # TODO maybe an is night feature?
-    def _get_time_of_day(self, timestamp: int) -> str:
+    def _get_time_of_day(self, timestamp: int) -> str: # NOTE: moet dan met onehotencoding en die stringindexer van ...
         """
         Extract time of day feature from timestamp
 
@@ -145,6 +182,19 @@ class FeatureExtractor:
         returns: DataFrame with 'magnitude' feature added
         """
         return data.withColumn("magnitude", F.sqrt(F.col("energy")))
+    
+    def _set_mean_energy(self, mean: float, std: float) -> None:
+        self._state._mean_energy = {"mean": mean, "std": std}
+    
+    def _set_std_energy(self, mean: float, std: float) -> None:
+        self._state._std_energy = {"mean": mean, "std": std}
+
+    def _set_mean_magnitude(self, mean: float, std: float) -> None:
+        self._state._mean_magnitude = {"mean": mean, "std": std}
+
+    def _set_std_magnitude(self, mean: float, std: float) -> None:
+        self._state._std_magnitude = {"mean": mean, "std": std}
+
 
     
     

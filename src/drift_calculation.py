@@ -66,7 +66,7 @@ def main():  # pragma: no cover
         labelnames=["target"],
         registry=registry,
     )
-    for target in ["is_large_transaction", "is_fraud"]:
+    for target in ["is_intoxicated"]:
         psi_gauge.labels(target=target).set(psi_s[target])
 
     push_to_gateway(TelemetryConfig.push_gateway_uri, job="telemetryBatch", registry=registry)

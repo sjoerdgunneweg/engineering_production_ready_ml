@@ -76,7 +76,7 @@ def get_preprocessed_data(spark: SparkSession) -> DataFrame:
     data = spark.read.parquet(PathsConfig.accelerometer_with_tac_parquet_path)
 
     
-
+    # TODO remove these comment
 
     # data = data.filter(F.col(DataConfig.partition_column).isin(pid_list))
 
