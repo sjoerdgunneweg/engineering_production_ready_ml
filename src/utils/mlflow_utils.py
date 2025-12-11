@@ -5,7 +5,6 @@ import mlflow
 
 from configs.configs import run_config
 
-
 def create_mlflow_experiment_if_not_exist():
     if not mlflow.get_experiment_by_name(run_config.experiment_name):
         mlflow.create_experiment(run_config.experiment_name)
@@ -55,7 +54,8 @@ def save_artifacts_to_mlflow(artifacts: dict[str, typing.Any], run_id: str):
             artifact_path = f"{tempdir}/{artifact_name}.pkl"
             with open(artifact_path, "wb") as f:
                 pickle.dump(artifact, f)
-                mlflow.log_artifact(artifact_path, f"{run_config.run_name}", run_id)
+
+            mlflow.log_artifact(artifact_path, f"{run_config.run_name}", run_id)
 
 
 #TODO log accuracy, precision, recall, f1 to mlflow 

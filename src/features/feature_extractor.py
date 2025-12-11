@@ -23,7 +23,7 @@ class _FeatureExtractorData: # TODO check this code and know what it does
         self._mean_magnitude: typing.Optional[dict[str, float]] = {}
         self._std_magnitude: typing.Optional[dict[str, float]] = {}
 
-        self._is_trained: bool = False
+        self._is_trained: bool = False # TODO remove if not needed
 
     def is_trained(self) -> bool: # TODO replace by die set ding
         return self._is_trained
@@ -102,7 +102,7 @@ class FeatureExtractor:
 
         data = self._get_energy(data)
         data = self._get_magnitude(data)
-        data = self._get_is_intoxicated(data, threshold=run_config.intoxication_threshold)
+        data = self._get_is_intoxicated(data, threshold=run_config.intoxication_threshold) # TODO remove?
 
         # TODO meer met clean coding dit doen!
         self._set_mean_energy(
@@ -123,6 +123,7 @@ class FeatureExtractor:
     def get_inference_features(self, data: DataFrame) -> DataFrame:
         data = self._get_energy(data)
         data = self._get_magnitude(data)
+        #TODO should i add the means and stuff here as well?
         return data
     
     def _get_is_intoxicated(self, data: DataFrame, threshold: float) -> DataFrame:

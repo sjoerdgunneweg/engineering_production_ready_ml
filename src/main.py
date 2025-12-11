@@ -41,6 +41,7 @@ def main(args: argparse.Namespace):
 
         random_forest_model = RandomForestModel() 
         random_forest_model.train_model(data)
+        print(random_forest_model.get_cv_scores())
         logging.info(f"Cross-validation scores: {random_forest_model.get_cv_scores()}")
 
         mlflow.set_tracking_uri(run_config.mlflow_tracking_uri)
@@ -58,7 +59,6 @@ def main(args: argparse.Namespace):
                 True: sum(data["is_intoxicated"] == True),
             }
         }
-        print(telemetry_data)
         with open(PathsConfig.telemetry_training_data_path, "w") as file:
             json.dump(telemetry_data, file)
             print(f"Written telemetry training data to: {PathsConfig.telemetry_training_data_path}")
