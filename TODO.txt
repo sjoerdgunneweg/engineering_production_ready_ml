@@ -1,4 +1,8 @@
-zet inshallah in preprocessing, test of dat werkt
+Comment en clean code csv_to_parquet.py!!!
 Grafana dashboard
 alle TODOS af
 unit tests
+Bind the model folder naar lokaal, zodat de modellen lokaal worden opgeslagen
+
+
+hij pakt nu de accuracy niet in mlflow

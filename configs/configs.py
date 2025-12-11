@@ -1,4 +1,4 @@
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 @dataclass(init=False, frozen=True)
 class PathsConfig:
@@ -10,7 +10,7 @@ class PathsConfig:
     accelerometer_with_tac_parquet_path: str = "data/accelerometer_with_tac/"
 
     telemetry_training_data_path: str = "data/telemetry/data_dist.json" 
-    telemetry_live_data_path: str = "data/telemetry/live_data_dist.json" # TODO change to better path
+    telemetry_live_data_path: str = "data/telemetry/live_data_dist.json" 
 
     preprocessing_data_path: str = "data/processed/preprocessed_data.parquet"
     features_data_path: str = "data/processed/features_data.parquet"
@@ -45,7 +45,7 @@ class _RunConfig:
     experiment_name: str = "Alcoholerometer_Experiment"
     run_name: str = "alcoholerometer_random_forest_run"
     random_seed: int = 42
-    sample_rate: float = 0.1 
+    sample_rate: float = 1.0 
     num_folds: int = 5 # TODO play with this value
     intoxication_threshold: float = 0.08  
     metrics_to_log: tuple[str, ...] = ('test_precision', 'train_precision', 'test_recall', 'train_recall', 'test_f1', 'train_f1')
@@ -73,9 +73,6 @@ class TelemetryConfig: # TODO alter to my style
     epsilon: float = 1 / 1e100
     push_gateway_uri: str = "http://prometheus_push_gateway:9091" # "http://localhost:9091"
     targets: tuple[str, ...] = ("is_intoxicated",)
-    # targets: list[str] = field(default_factory=lambda: [
-    #     "is_intoxicated"
-    # ])
 
 @dataclass(init=False, frozen=True)
 class ModelConfig:
@@ -83,7 +80,5 @@ class ModelConfig:
     max_depth: int = 10
     n_estimators: int = 100
     model_name: str = "alcoholerometer_random_forest"
-
-
 
 run_config = _RunConfig()

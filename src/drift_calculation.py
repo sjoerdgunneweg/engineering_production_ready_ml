@@ -14,7 +14,6 @@ from configs.configs import PathsConfig, TelemetryConfig, run_config
 
 logger = logging.getLogger(__name__)
 
-
 def get_psi(training_percentages: typing.Tuple[float], latest_percentages: typing.Tuple[float]) -> float:
     psi = 0
     for training, latest in zip(training_percentages, latest_percentages):

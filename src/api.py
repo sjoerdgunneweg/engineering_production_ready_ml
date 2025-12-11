@@ -41,7 +41,7 @@ SparkSession.builder.master(run_config.spark_master_url).getOrCreate()
 
 logger.info("Starting flask app.")
 app = Flask(__name__)
-metrics = PrometheusMetrics(app, defaults_prefix=run_config.app_name) # TODO kijk of dit goed werkt in prometheus
+metrics = PrometheusMetrics(app, defaults_prefix=run_config.app_name)
 metrics.info(
     f"{run_config.app_name}_model_version",
     "Model version information",
@@ -88,7 +88,8 @@ def predict():
     features = feature_extractor.get_features(request_data)
     features = features.toPandas()
 
-    EXPECTED_TRAINING_ORDER = [ # TODO check if this is needed
+    # training and inference feature order must be the same, enforced it here
+    EXPECTED_TRAINING_ORDER = [
         "time",
         "x",
         "y",
@@ -97,8 +98,6 @@ def predict():
         "magnitude",
     ]
     features = features.reindex(columns=EXPECTED_TRAINING_ORDER)
-
-    features = features.drop(columns=["pid", "is_intoxicated"], errors='ignore') # TODO if this line sovles the issue, make a seperet get_features for inference and training in feature extractor
 
     logging.info("Features are ready. Calculating prediction.")
     prediction = model.predict(features)[0].item()

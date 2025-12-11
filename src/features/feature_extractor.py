@@ -12,11 +12,11 @@ from pendulum import datetime
 
 from pyspark.sql import functions as F
 
-class _FeatureExtractorData: # TODO check this code and know what it does
+class _FeatureExtractorData:
     """
     Class for holding the data for FeatureExtractor
     """
-    def __init__(self): # TODO
+    def __init__(self):
         self._mean_energy: typing.Optional[dict[str, float]] = {}
         self._std_energy: typing.Optional[dict[str, float]] = {}
         self._mean_magnitude: typing.Optional[dict[str, float]] = {}
@@ -42,17 +42,12 @@ class _FeatureExtractorData: # TODO check this code and know what it does
         :raises RuntimeError: if experiment does not exist.
         :raises Exception: if given run_id is not in the expected mlflow experiment.
         """
-        # WARNING: Beware that I realized in WSL, the temp directory is not cleaned as it should. This may result in
-        # unexpected issues with loading and saving.
         with tempfile.TemporaryDirectory() as dir_name:
             mlflow_experiment = mlflow.get_experiment_by_name(run_config.experiment_name)
             if mlflow_experiment is None:
                 raise RuntimeError(f"Experiment {run_config.experiment_name} does not exist in MLFlow.")
             mlflow.artifacts.download_artifacts(run_id=run_id, artifact_path=run_config.run_name, dst_path=dir_name)
-
-            # mlflow.artifacts.download_artifacts(run_id=run_id, dst_path=dir_name) # TODO kijk hier naar 
             artifacts_path = os.path.join(dir_name, run_config.run_name)
-
 
             with open(os.path.join(artifacts_path, "mean_energy.pkl"), "rb") as f:
                 self._mean_energy = pickle.load(f)
@@ -92,11 +87,11 @@ class FeatureExtractor:
         is_inference_time = self._state.is_set()
         return self.get_inference_features(data) if is_inference_time else self.get_training_features(data)
     
-    def get_training_features(self, data: DataFrame) -> DataFrame: # TODO sla de features op in mlflow want daarna werkt die is set ding van hem wel 
+    def get_training_features(self, data: DataFrame) -> DataFrame: 
 
         data = self._get_energy(data)
         data = self._get_magnitude(data)
-        data = self._get_is_intoxicated(data, threshold=run_config.intoxication_threshold) # TODO remove?
+        data = self._get_is_intoxicated(data, threshold=run_config.intoxication_threshold)
 
         # TODO meer met clean coding dit doen!
         self._set_mean_energy(
@@ -142,7 +137,7 @@ class FeatureExtractor:
         else:
             return 'night'
         
-    def _get_energy(self, data: DataFrame) -> DataFrame: # TODO fix comment maybe to chatty
+    def _get_energy(self, data: DataFrame) -> DataFrame:
         """
         Compute energy feature from accelerometer data
 
@@ -161,8 +156,6 @@ class FeatureExtractor:
         """
         Computes: mean energy per window.
 
-        Requires `energy` and `window_id` columns.
-
         returns: DataFrame with mean_energy added
         """
         return (
@@ -170,7 +163,7 @@ class FeatureExtractor:
                 .agg(F.mean("energy").alias("mean_energy"))
         )
     
-    def _get_magnitude(self, data: DataFrame) -> DataFrame: # TODO fix comments
+    def _get_magnitude(self, data: DataFrame) -> DataFrame: 
         """
         Compute magnitude = sqrt(x^2 + y^2 + z^2)
 
