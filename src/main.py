@@ -12,7 +12,7 @@ from features.feature_extractor import FeatureExtractor
 from random_forest import RandomForestModel
 
 from configs.configs import PathsConfig, run_config, ModelConfig
-from utils.mlflow_utils import create_mlflow_experiment_if_not_exist, create_mlflow_run_if_not_exists, get_latest_run_id, save_artifacts_to_mlflow
+from utils.mlflow_utils import create_mlflow_experiment_if_not_exist, create_mlflow_run_if_not_exists, get_latest_run_id, log_metrics_to_mlflow, save_artifacts_to_mlflow
 
 def main(args: argparse.Namespace):
 
@@ -41,12 +41,15 @@ def main(args: argparse.Namespace):
 
         random_forest_model = RandomForestModel() 
         random_forest_model.train_model(data)
-        print(random_forest_model.get_cv_scores())
-        logging.info(f"Cross-validation scores: {random_forest_model.get_cv_scores()}")
+        print(random_forest_model.get_cv_scores()) # TODO maybe remove
+        # logging.info(f"Cross-validation scores: {random_forest_model.get_cv_scores()}")
 
         mlflow.set_tracking_uri(run_config.mlflow_tracking_uri)
         create_mlflow_experiment_if_not_exist()
         create_mlflow_run_if_not_exists(run_config.run_name)
+
+        log_metrics_to_mlflow(random_forest_model.get_cv_scores(), get_latest_run_id(run_config.run_name))
+
         save_artifacts_to_mlflow(
             {ModelConfig.model_name: random_forest_model, "cv_scores": random_forest_model.get_cv_scores()},
             get_latest_run_id(run_config.run_name),

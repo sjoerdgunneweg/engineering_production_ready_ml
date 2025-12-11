@@ -58,4 +58,18 @@ def save_artifacts_to_mlflow(artifacts: dict[str, typing.Any], run_id: str):
             mlflow.log_artifact(artifact_path, f"{run_config.run_name}", run_id)
 
 
-#TODO log accuracy, precision, recall, f1 to mlflow 
+def log_metrics_to_mlflow(cv_scores: dict[str, typing.Any], run_id: str):
+    """
+    Logs the passed cross-validation scores to MLFlow.
+
+    :raise RuntimeError: if MLFlow does not have the expected experiment..
+    """
+    mlflow_experiment = mlflow.get_experiment_by_name(run_config.experiment_name)
+    if mlflow_experiment is None:
+        raise RuntimeError(f"Experiment {run_config.experiment_name} does not exist in MLFlow.")
+    
+    for metric in run_config.metrics_to_log:
+        if metric in cv_scores:
+            # log the mean of the metric across folds
+            mlflow.log_metric(metric, cv_scores[metric].mean(), run_id=run_id)
+

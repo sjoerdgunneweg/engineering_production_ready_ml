@@ -25,7 +25,7 @@ class DataConfig:
     tac_time_column: str = "timestamp"
 
     window_size_seconds: int = 10
-    pids_to_use: str = "BK7610"
+    pids_to_use: str = "BK7610" # TODO check if needs to be removed
     # pids_to_use: list[str] = field(default_factory=lambda: [
     #     "BK7610", "BU4707", "CC6740"
     # ])
@@ -40,7 +40,7 @@ class _RunConfig:
     Allows config to be overridden by environment variables if needed.
     """
     app_name: str = "alcoholerometer"
-    spark_master_url: str = "local[2]"
+    spark_master_url: str = "local[2]" # TODO check if this is used everywhere
     mlflow_tracking_uri: str = "http://mlflow:8080" #"http://localhost:8080"
     experiment_name: str = "Alcoholerometer_Experiment"
     run_name: str = "alcoholerometer_random_forest_run"
@@ -48,7 +48,8 @@ class _RunConfig:
     sample_rate: float = 0.1 
     num_folds: int = 5 # TODO play with this value
     intoxication_threshold: float = 0.08  
-
+    metrics_to_log: tuple[str, ...] = ('test_precision', 'train_precision', 'test_recall', 'train_recall', 'test_f1', 'train_f1')
+    
 @dataclass(frozen=True)
 class TelemetryConfig: # TODO alter to my style
     # The number of instances that should be in the live distribution.
