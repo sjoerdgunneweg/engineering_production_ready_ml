@@ -17,7 +17,7 @@ dag = DAG("alcoholerometer_training", default_args=default_args)
 
 preprocessing_task = DockerOperator(
     docker_url="unix://var/run/docker.sock",
-    command="python src/main.py --preprocess",
+    command="python src/main.py --preprocess", 
     image="alcoholerometer:latest",
     network_mode="infra_default",
     task_id="preprocessing",

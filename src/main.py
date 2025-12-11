@@ -4,6 +4,7 @@ import mlflow
 import json
 
 from data.data_preprocessing import get_preprocessed_data
+from data.data_preprocessingv2 import get_preprocessed_data_v2
 from mlflow.entities import RunStatus
 
 
@@ -19,7 +20,8 @@ def main(args: argparse.Namespace):
     spark = SparkSession.builder.master("local[*]").getOrCreate()
 
     if args.preprocess:
-        data = get_preprocessed_data(spark) 
+        # data = get_preprocessed_data(spark) 
+        data = get_preprocessed_data_v2(spark)
         data.write.parquet(PathsConfig.preprocessing_data_path, mode="overwrite")
 
     if args.feat_eng:
