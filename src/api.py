@@ -5,11 +5,11 @@ import mlflow
 from http import HTTPStatus
 from pyspark.sql import SparkSession
 from prometheus_flask_exporter import PrometheusMetrics
-from prometheus_client import Counter
+from prometheus_client import Counter, Histogram
 from flask import Flask, request, jsonify
 
 
-from configs.configs import run_config, ModelConfig
+from configs.configs import TelemetryConfig, run_config, ModelConfig
 from src.features.feature_extractor import FeatureExtractor
 from src.utils.mlflow_utils import get_latest_run_id
 from src.random_forest import RandomForestModel
@@ -50,9 +50,16 @@ metrics.info(
     model_name=ModelConfig.model_name,
 )
 
-pred_counter = Counter(f"{run_config.app_name}_predictions", "Count of predictions by class", labelnames=["pred"]) # TODO what does this do?
+pred_counter = Counter(f"{run_config.app_name}_predictions", "Count of predictions by class", labelnames=["pred"]) 
 data_quality_counter = Counter(
     f"{run_config.app_name}_data_quality", "Count of data quality issues", labelnames=["quality_rule"]
+)
+
+reload_counter = Counter(f"{run_config.app_name}_reloads", "Count of model reload requests")
+predict_latency_histogram = Histogram(
+    f"{run_config.app_name}_request_latency_seconds",
+    "Histogram of request latency",
+    buckets=(0.1, 0.5, 1, 2.5, 5, 10),
 )
 
 
@@ -72,35 +79,44 @@ def predict():
     feature_extractor = get_feature_extractor_loaded()
     spark = SparkSession.builder.master(run_config.spark_master_url).getOrCreate()
 
-    request_data = spark.createDataFrame(
-        [
-            {
-                "time": request.json["time"],
-                "x": request.json["x"],
-                "y": request.json["y"],
-                "z": request.json["z"],
-                "energy": request.json["energy"],
-                "magnitude": request.json["magnitude"],
-            },
+    # if request.json["amount"] < 0: # TODO something like this for data quality checks
+    #     logging.warning("Received negative amount in request.")
+    #     data_quality_counter.labels(quality_rule="neg_amount").inc()
+    # if category_received := request.json["category"] not in feature_extractor.get_known_categories():
+    #     logging.error(f"Received unknown category in request: {category_received}.")
+    #     data_quality_counter.labels(quality_rule="unknown_category").inc()
+
+    with predict_latency_histogram.time(): 
+        request_data = spark.createDataFrame(
+            [
+                {
+                    "time": request.json["time"],
+                    "x": request.json["x"],
+                    "y": request.json["y"],
+                    "z": request.json["z"],
+                    "energy": request.json["energy"],
+                    "magnitude": request.json["magnitude"],
+                },
+            ]
+        )
+        logging.info("Calculating features for the request.")
+        features = feature_extractor.get_features(request_data)
+        features = features.toPandas()
+
+        # training and inference feature order must be the same, enforced it here
+        EXPECTED_TRAINING_ORDER = [
+            "time",
+            "x",
+            "y",
+            "z",
+            "energy",
+            "magnitude",
         ]
-    )
-    logging.info("Calculating features for the request.")
-    features = feature_extractor.get_features(request_data)
-    features = features.toPandas()
+        features = features.reindex(columns=EXPECTED_TRAINING_ORDER)
 
-    # training and inference feature order must be the same, enforced it here
-    EXPECTED_TRAINING_ORDER = [
-        "time",
-        "x",
-        "y",
-        "z",
-        "energy",
-        "magnitude",
-    ]
-    features = features.reindex(columns=EXPECTED_TRAINING_ORDER)
+        logging.info("Features are ready. Calculating prediction.")
+        prediction = model.predict(features)[0].item()
 
-    logging.info("Features are ready. Calculating prediction.")
-    prediction = model.predict(features)[0].item()
     pred_counter.labels(pred="true" if prediction else "false").inc()
     logging.info(f"Prediction complete. Prediction: {prediction}")
     return jsonify(prediction)
@@ -113,5 +129,6 @@ def reload():
     get_feature_extractor_loaded.cache_clear()
 
     get_model()
-    get_feature_extractor_loaded()    
+    get_feature_extractor_loaded()
+    reload_counter.inc()    
     return "Reloaded Model Successfully", HTTPStatus.OK

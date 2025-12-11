@@ -5,4 +5,8 @@ unit tests
 Bind the model folder naar lokaal, zodat de modellen lokaal worden opgeslagen
 
 
-hij pakt nu de accuracy niet in mlflow
+Extra metrics according to grafana:
+
+Traffic - How much demand is placed on your system
+Errors - Rate of requests that are failing
+Saturation - How “full” your system is

@@ -22,13 +22,7 @@ class DataConfig:
     partition_column: str = "pid"
     tac_reading_column = "TAC_Reading"
 
-    tac_time_column: str = "timestamp"
-
     window_size_seconds: int = 10
-    pids_to_use: str = "BK7610" # TODO check if needs to be removed
-    # pids_to_use: list[str] = field(default_factory=lambda: [
-    #     "BK7610", "BU4707", "CC6740"
-    # ])
 
     
 
@@ -40,15 +34,15 @@ class _RunConfig:
     Allows config to be overridden by environment variables if needed.
     """
     app_name: str = "alcoholerometer"
-    spark_master_url: str = "local[2]" # TODO check if this is used everywhere
+    spark_master_url: str = "local[2]"
     mlflow_tracking_uri: str = "http://mlflow:8080" #"http://localhost:8080"
     experiment_name: str = "Alcoholerometer_Experiment"
     run_name: str = "alcoholerometer_random_forest_run"
     random_seed: int = 42
     sample_rate: float = 1.0 
-    num_folds: int = 5 # TODO play with this value
+    num_folds: int = 5
     intoxication_threshold: float = 0.08  
-    metrics_to_log: tuple[str, ...] = ('test_precision', 'train_precision', 'test_recall', 'train_recall', 'test_f1', 'train_f1')
+    metrics_to_log: tuple[str, ...] = ('test_precision', 'train_precision', 'test_recall', 'train_recall', 'test_f1', 'train_f1', 'test_accuracy', 'train_accuracy')
     
 @dataclass(frozen=True)
 class TelemetryConfig: # TODO alter to my style
