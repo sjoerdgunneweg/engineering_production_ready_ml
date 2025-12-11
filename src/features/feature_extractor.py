@@ -3,13 +3,12 @@ import pickle
 import tempfile
 import typing
 
-from pyspark.sql import DataFrame, SparkSession
+from pyspark.sql import DataFrame
 import mlflow
 from pyspark.ml.feature import StringIndexerModel, OneHotEncoderModel
 
-from configs.configs import run_config, PathsConfig
+from configs.configs import run_config
 from pendulum import datetime
-import numpy as np
 
 from pyspark.sql import functions as F
 
@@ -22,13 +21,8 @@ class _FeatureExtractorData: # TODO check this code and know what it does
         self._std_energy: typing.Optional[dict[str, float]] = {}
         self._mean_magnitude: typing.Optional[dict[str, float]] = {}
         self._std_magnitude: typing.Optional[dict[str, float]] = {}
-
-        self._is_trained: bool = False # TODO remove if not needed
-
-    def is_trained(self) -> bool: # TODO replace by die set ding
-        return self._is_trained
     
-    def is_set(self) -> bool: # TODO maak keuze tussen deze en is trained
+    def is_set(self) -> bool: 
         return True if None not in self.__getstate__().values() and {} not in self.__getstate__().values() else False
 
     def save(self, directory_path: str):
