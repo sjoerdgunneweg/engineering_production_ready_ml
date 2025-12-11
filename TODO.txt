@@ -1,3 +1,3 @@
-
+model reload faalt aangezien hij al naar die json schrijft voordat model goed werkt 
 Laat app pas runnen wanneer de dag gerund is
 HAAL DIE TAC FEATURE UIT HET TRAINEIN

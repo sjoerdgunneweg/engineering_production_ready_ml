@@ -76,15 +76,6 @@ services:
       retries: 3
       interval: 5s
 
-  # init_airflow:
-  #   image: apache/airflow:3.1.0-python3.10
-  #   depends_on:
-  #     airflow:
-  #       condition: service_healthy
-  #   entrypoint: ["bash", "-c"]
-  #   command: >
-  #     sh -c "airflow dags trigger alcoholerometer_training"
-
   grafana:
     image: grafana/grafana:latest
     depends_on:

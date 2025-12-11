@@ -1,4 +1,5 @@
 import argparse
+import logging
 import mlflow
 import json
 
@@ -28,7 +29,6 @@ def main(args: argparse.Namespace):
         data = feature_extractor.get_features(data)
 
 
-        # # TODO check what dthis does
         mlflow.set_tracking_uri(run_config.mlflow_tracking_uri)
         create_mlflow_experiment_if_not_exist()
         create_mlflow_run_if_not_exists(run_config.run_name)
@@ -41,9 +41,8 @@ def main(args: argparse.Namespace):
 
         random_forest_model = RandomForestModel() 
         random_forest_model.train_model(data)
-        print(random_forest_model.get_cv_scores()) # TODO maybe log this?
+        logging.info(f"Cross-validation scores: {random_forest_model.get_cv_scores()}")
 
-        # TODO implement something similar
         mlflow.set_tracking_uri(run_config.mlflow_tracking_uri)
         create_mlflow_experiment_if_not_exist()
         create_mlflow_run_if_not_exists(run_config.run_name)
@@ -53,7 +52,7 @@ def main(args: argparse.Namespace):
         )
         mlflow.end_run(RunStatus.to_string(RunStatus.FINISHED))
 
-        telemetry_data = {
+        telemetry_data = { # TODO update to somehting else?
             "is_intoxicated": {
                 False: sum(data["is_intoxicated"] == False),
                 True: sum(data["is_intoxicated"] == True),
