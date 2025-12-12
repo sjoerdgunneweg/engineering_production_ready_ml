@@ -128,8 +128,6 @@ def _calculate_window_features(acceleration_data_path: str) -> Dict[str, pd.Data
     
     # create window of 10 seconds. 
     acceleration_df[DataConfig.window_key_column] = (acceleration_df[DataConfig.time_in_seconds_column] // DataConfig.window_size_seconds) * DataConfig.window_size_seconds
-
-    print(acceleration_df.head())
     
     features_by_pid = {}
     for pid, group_df in acceleration_df.groupby(DataConfig.partition_column):
