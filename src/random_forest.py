@@ -19,9 +19,12 @@ class RandomForestModel:
         return RandomForestClassifier(max_depth=ModelConfig.max_depth, n_estimators=ModelConfig.n_estimators, random_state=ModelConfig.random_seed)
     
     @staticmethod
-    def _get_x_y(data: pd.DataFrame) -> tuple[pd.DataFrame, pd.Series]:
-        data = data.drop("pid", axis=1) # TODO maybe put this during grabbijng the features, it is a str but the model does not accept it
-        data = data.drop("TAC_Reading", axis=1) # remove because of label leakage
+    def _remove_non_training_features(data: pd.DataFrame) -> pd.DataFrame:
+        data = data.drop(columns=["pid", "TAC_Reading"])
+        return data
+
+    def _get_x_y(self, data: pd.DataFrame) -> tuple[pd.DataFrame, pd.Series]:
+        data = self._remove_non_training_features(data)
         return data.drop("is_intoxicated", axis=1), data["is_intoxicated"].astype(bool)
 
     def train_model(self, data) -> None:
@@ -34,7 +37,7 @@ class RandomForestModel:
             cv=run_config.num_folds,
             return_train_score=True,
             n_jobs=-1, # uses all cores
-            scoring=["precision", "recall", "f1", "accuracy"], # TODO accuracy not on mlflow yet?
+            scoring=["precision", "recall", "f1", "accuracy"],
         )
         
         self._model = classifier.fit(x, y)

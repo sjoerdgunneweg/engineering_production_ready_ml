@@ -36,6 +36,7 @@ def test_model_get_x_y():
     ]
 
     for case in cases:
-        out_x, out_y = RandomForestModel._get_x_y(case["data"])
+        random_forest_model = RandomForestModel()
+        out_x, out_y = random_forest_model._get_x_y(case["data"])
         pd.testing.assert_frame_equal(out_x, case["expected_x"])
         pd.testing.assert_series_equal(out_y, case["expected_y"])

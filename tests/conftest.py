@@ -8,4 +8,3 @@ from configs.configs import run_config
 def spark_fixture():
     spark = SparkSession.builder.master(run_config.spark_master_url).getOrCreate()
     yield spark
-    spark.stop() # TODO is this needed? i added this myself

@@ -1,7 +1,6 @@
 .PHONY: test
 test:
 	docker compose -f infra/test-compose.yaml run --rm --remove-orphans pytest
-# 	coverage run -m pytest -v -p no:warnings . && coverage report --rcfile=.coveragerc
 
 .PHONY: format
 format:

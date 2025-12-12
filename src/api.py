@@ -74,8 +74,6 @@ def health():
 def predict():
     logging.info("Received prediction request at /predict.")
     model = get_model()
-    print(model)
-    print("Model loaded successfully.")
     feature_extractor = get_feature_extractor_loaded()
     spark = SparkSession.builder.master(run_config.spark_master_url).getOrCreate()
 

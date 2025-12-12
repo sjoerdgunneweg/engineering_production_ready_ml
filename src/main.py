@@ -14,6 +14,12 @@ from random_forest import RandomForestModel
 from configs.configs import PathsConfig, run_config, ModelConfig
 from utils.mlflow_utils import create_mlflow_experiment_if_not_exist, create_mlflow_run_if_not_exists, get_latest_run_id, log_metrics_to_mlflow, save_artifacts_to_mlflow
 
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
+
 def main(args: argparse.Namespace):
 
     spark = SparkSession.builder.master("local[*]").getOrCreate()
@@ -41,8 +47,7 @@ def main(args: argparse.Namespace):
 
         random_forest_model = RandomForestModel() 
         random_forest_model.train_model(data)
-        print(random_forest_model.get_cv_scores()) # TODO maybe remove
-        # logging.info(f"Cross-validation scores: {random_forest_model.get_cv_scores()}")
+        logger.info(f"Cross-validation scores: {random_forest_model.get_cv_scores()}")
 
         mlflow.set_tracking_uri(run_config.mlflow_tracking_uri)
         create_mlflow_experiment_if_not_exist()
@@ -64,7 +69,7 @@ def main(args: argparse.Namespace):
         }
         with open(PathsConfig.telemetry_training_data_path, "w") as file:
             json.dump(telemetry_data, file)
-            print(f"Written telemetry training data to: {PathsConfig.telemetry_training_data_path}")
+            logger.info(f"Written telemetry training data to: {PathsConfig.telemetry_training_data_path}")
 
 
 if __name__ == "__main__":

@@ -63,7 +63,7 @@ def _add_tac_reading_to_windowed_data(feature_frames_dict: Dict[str, pd.DataFram
     """
     Adds the closest previous TAC_Reading to each time window 
 
-    returns: Dict[str, pd.DataFrame]: dictionary of labeled feature DataFrames per PID # TODO fix comment
+    returns: Dict[str, pd.DataFrame]: dictionary of feature DataFrames per pid with TAC_Reading added
     """
     
     if full_tac_df.empty:

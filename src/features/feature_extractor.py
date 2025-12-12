@@ -91,10 +91,9 @@ class FeatureExtractor:
 
         data = self._get_energy(data)
         data = self._get_magnitude(data)
-        data = self._get_is_intoxicated(data, threshold=run_config.intoxication_threshold)
+        data = self._get_is_intoxicated(data)
 
-        # TODO meer met clean coding dit doen!
-        self._set_mean_energy(
+        self._set_mean_energy( # TODO what does this do?
             data.select(F.mean(F.col("energy"))).collect()[0][0], data.select(F.std(F.col("energy"))).collect()[0][0]
         )
         self._set_mean_magnitude(
@@ -112,30 +111,10 @@ class FeatureExtractor:
     def _get_inference_features(self, data: DataFrame) -> DataFrame:
         data = self._get_energy(data)
         data = self._get_magnitude(data)
-        #TODO should i add the means and stuff here as well? or should i remove energy and magnitude as well
         return data
     
-    def _get_is_intoxicated(self, data: DataFrame, threshold: float) -> DataFrame:
-        return data.withColumn("is_intoxicated", F.col("TAC_Reading") >= threshold)
-
-
-    # TODO maybe an is night feature?
-    def _get_time_of_day(self, timestamp: int) -> str: # NOTE: moet dan met onehotencoding en die stringindexer van ...
-        """
-        Extract time of day feature from timestamp
-
-        returns: str: 'morning', 'afternoon', 'evening', 'night'
-        """
-        hour = datetime.utcfromtimestamp(timestamp).hour
-
-        if 5 <= hour < 12:
-            return 'morning'
-        elif 12 <= hour < 17:
-            return 'afternoon'
-        elif 17 <= hour < 21:
-            return 'evening'
-        else:
-            return 'night'
+    def _get_is_intoxicated(self, data: DataFrame) -> DataFrame:
+        return data.withColumn("is_intoxicated", F.col("TAC_Reading") >= run_config.intoxication_threshold)
         
     def _get_energy(self, data: DataFrame) -> DataFrame:
         """
@@ -151,17 +130,6 @@ class FeatureExtractor:
             F.col("z") * F.col("z")
         )
     )
-
-    def _get_mean_energy(self, data: DataFrame) -> DataFrame: # TODO fix die window id column
-        """
-        Computes: mean energy per window.
-
-        returns: DataFrame with mean_energy added
-        """
-        return (
-            data.groupBy("window_id")
-                .agg(F.mean("energy").alias("mean_energy"))
-        )
     
     def _get_magnitude(self, data: DataFrame) -> DataFrame: 
         """
@@ -171,7 +139,7 @@ class FeatureExtractor:
         """
         return data.withColumn("magnitude", F.sqrt(F.col("energy")))
     
-    def _set_mean_energy(self, mean: float, std: float) -> None:
+    def _set_mean_energy(self, mean: float, std: float) -> None: # TODO wat doen deze?
         self._state._mean_energy = {"mean": mean, "std": std}
     
     def _set_std_energy(self, mean: float, std: float) -> None:
