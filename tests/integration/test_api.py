@@ -1,1 +1,1 @@
-from src.api import get_model, get_feature_extractor_loaded, health, predict, reload
+# from src.api import get_model, get_feature_extractor_loaded, health, predict, reload

@@ -2,8 +2,8 @@ from dataclasses import dataclass
 
 @dataclass(init=False, frozen=True)
 class PathsConfig:
-    clean_tac_path: str = "data/bar_crawl_detecting_heavy_drinking/data/clean_tac/"
-    accelerometer_data_path: str = "data/bar_crawl_detecting_heavy_drinking/data/all_accelerometer_data_pids_13.csv"
+    clean_tac_path: str = "data/bar+crawl+detecting+heavy+drinking/data/clean_tac/"
+    accelerometer_data_path: str = "data/bar+crawl+detecting+heavy+drinking/data/all_accelerometer_data_pids_13.csv"
 
     accelerometer_parquet_path: str = "data/accelerometer/"
     tac_parquet_path: str = "data/tac/"
@@ -15,6 +15,11 @@ class PathsConfig:
     preprocessing_data_path: str = "data/processed/preprocessed_data.parquet"
     features_data_path: str = "data/processed/features_data.parquet"
 
+    mean_energy_file_name: str = "mean_energy.pkl"
+    std_energy_file_name: str = "std_energy.pkl"
+    mean_magnitude_file_name: str = "mean_magnitude.pkl"
+    std_magnitude_file_name: str = "std_magnitude.pkl"
+
 @dataclass(init=False, frozen=True)
 class DataConfig:
     acceleleration_time_column: str = "time"
@@ -23,7 +28,13 @@ class DataConfig:
     tac_reading_column = "TAC_Reading"
 
     window_size_seconds: int = 10
+    pid_regex_pattern: str = r'([A-Z]{2}\d{4})' # regex finding pid pattern like 'AB1234'
 
+    window_start_index_name: str = "window_start_time" # TODO think of better name
+    datetime_column: str = "window_time_datetime"
+    time_in_seconds_column: str = "window_time_seconds"
+    window_key_column: str = "window_key"
+    
     
 
 @dataclass(frozen=True)

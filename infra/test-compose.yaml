@@ -1,0 +1,53 @@
+services:
+
+  app:
+    image: alcoholerometer:latest
+    command: flask --app src/api run --host 0.0.0.0 --port 5001
+    depends_on:
+      mlflow:
+        condition: service_healthy
+      airflow:
+        condition: service_healthy 
+    ports:
+      - "5001:5001"  
+    healthcheck:
+      test: apt-get update -y && apt-get install -y curl && curl --fail http://localhost:5001/health || exit 1
+      retries: 5
+      interval: 30s  # Cache loading is taking a long time for this app
+
+  mlflow:
+    image: ghcr.io/mlflow/mlflow:v3.3.0rc0
+    command: mlflow server --host 0.0.0.0 --port 8080
+    ports:
+      - "8080:8080"
+    healthcheck:
+      test: apt-get update -y && apt-get install -y curl && curl --fail http://localhost:8080 || exit 1
+      retries: 3
+      interval: 5s
+
+  airflow:
+    image: apache/airflow:3.1.0-python3.10
+    command: airflow standalone
+    ports:
+      - "4242:8080"  # note: We need to use a different port than 8080 as it is already assigned for mlflow.
+    environment:
+      - _AIRFLOW_DB_MIGRATE=true
+      - AIRFLOW__CORE__SIMPLE_AUTH_MANAGER_ALL_ADMINS=true  # note: Disabling authentication completely.
+    volumes:
+      - ./airflow/dags/:/opt/airflow/dags  # note: Normally you pass DAGs to Airflow in a different way, through CI. Like moving to a Cloud Storage Directory where Airflow is getting the DAGs from.
+      - /var/run/docker.sock:/var/run/docker.sock  # note: For local deployment: linking local docker to Airflow
+    healthcheck:
+      test: wget http://localhost:8080/api/v2/monitor/health -o /dev/null || exit 1  # note: wget downloads the file. I do not need it. So we move it to /dev/null
+      retries: 3
+      interval: 5s
+
+  pytest: # Note: only works if the images have been built and DAG has been run once using infra/docker-compose.yaml
+    image: alcoholerometer:latest
+    command: bash -c "coverage run -m pytest -v . && coverage report --rcfile=.coveragerc"
+    depends_on:
+      app:
+        condition: service_healthy
+      mlflow:
+        condition: service_healthy
+      airflow:
+        condition: service_healthy

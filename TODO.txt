@@ -3,6 +3,7 @@ Grafana dashboard
 alle TODOS af
 unit tests
 Bind the model folder naar lokaal, zodat de modellen lokaal worden opgeslagen
+Haal misschien energy en ... weg uit inference features zodat je eig alleen tijd en xyz hoort te geven
 
 
 Extra metrics according to grafana:
@@ -10,3 +11,11 @@ Extra metrics according to grafana:
 Traffic - How much demand is placed on your system
 Errors - Rate of requests that are failing
 Saturation - How “full” your system is
+
+Zet accuracy enzo er in!
+en throughput
+
+README!!!
+
+
+Welke alert manager in README

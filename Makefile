@@ -1,6 +1,7 @@
 .PHONY: test
 test:
-	coverage run -m pytest -v -p no:warnings . && coverage report --rcfile=.coveragerc
+	docker compose -f infra/test-compose.yaml run --rm --remove-orphans pytest
+# 	coverage run -m pytest -v -p no:warnings . && coverage report --rcfile=.coveragerc
 
 .PHONY: format
 format:
@@ -17,4 +18,4 @@ up: build
 
 .PHONY: logs
 logs:
-	docker compose -f infra/docker-compose.yaml logs -f app
+	docker compose -f infra/docker-compose.yaml logs -f

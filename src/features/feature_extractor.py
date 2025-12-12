@@ -7,7 +7,7 @@ from pyspark.sql import DataFrame
 import mlflow
 from pyspark.ml.feature import StringIndexerModel, OneHotEncoderModel
 
-from configs.configs import run_config
+from configs.configs import PathsConfig, run_config
 from pendulum import datetime
 
 from pyspark.sql import functions as F
@@ -26,13 +26,13 @@ class _FeatureExtractorData:
         return True if None not in self.__getstate__().values() and {} not in self.__getstate__().values() else False
 
     def save(self, directory_path: str):
-        with open(os.path.join(directory_path, "mean_energy.pkl"), "wb") as f:
+        with open(os.path.join(directory_path, PathsConfig.mean_energy_file_name), "wb") as f:
             pickle.dump(self._mean_energy, f)
-        with open(os.path.join(directory_path, "std_energy.pkl"), "wb") as f:
+        with open(os.path.join(directory_path, PathsConfig.std_energy_file_name), "wb") as f:
             pickle.dump(self._std_energy, f)
-        with open(os.path.join(directory_path, "mean_magnitude.pkl"), "wb") as f:
+        with open(os.path.join(directory_path, PathsConfig.mean_magnitude_file_name), "wb") as f:
             pickle.dump(self._mean_magnitude, f)
-        with open(os.path.join(directory_path, "std_magnitude.pkl"), "wb") as f:
+        with open(os.path.join(directory_path, PathsConfig.std_magnitude_file_name), "wb") as f:
             pickle.dump(self._std_magnitude, f)
 
     def load_from_mlflow(self, run_id: str):  # pragma: no cover
@@ -85,9 +85,9 @@ class FeatureExtractor:
 
     def get_features(self, data: DataFrame) -> DataFrame:
         is_inference_time = self._state.is_set()
-        return self.get_inference_features(data) if is_inference_time else self.get_training_features(data)
+        return self._get_inference_features(data) if is_inference_time else self._get_training_features(data)
     
-    def get_training_features(self, data: DataFrame) -> DataFrame: 
+    def _get_training_features(self, data: DataFrame) -> DataFrame: 
 
         data = self._get_energy(data)
         data = self._get_magnitude(data)
@@ -109,15 +109,15 @@ class FeatureExtractor:
 
         return data
     
-    def get_inference_features(self, data: DataFrame) -> DataFrame:
+    def _get_inference_features(self, data: DataFrame) -> DataFrame:
         data = self._get_energy(data)
         data = self._get_magnitude(data)
-        #TODO should i add the means and stuff here as well?
+        #TODO should i add the means and stuff here as well? or should i remove energy and magnitude as well
         return data
     
     def _get_is_intoxicated(self, data: DataFrame, threshold: float) -> DataFrame:
         return data.withColumn("is_intoxicated", F.col("TAC_Reading") >= threshold)
-    
+
 
     # TODO maybe an is night feature?
     def _get_time_of_day(self, timestamp: int) -> str: # NOTE: moet dan met onehotencoding en die stringindexer van ...

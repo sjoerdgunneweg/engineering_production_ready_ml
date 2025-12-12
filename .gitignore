@@ -210,6 +210,8 @@ __marimo__/
 # Dataset
 /data/
 
+infra/grafana
+
 
 src/model.py
 
