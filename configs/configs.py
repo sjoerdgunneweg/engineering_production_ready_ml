@@ -30,7 +30,7 @@ class DataConfig:
     window_size_seconds: int = 10
     pid_regex_pattern: str = r'([A-Z]{2}\d{4})' # regex finding pid pattern like 'AB1234'
 
-    window_start_index_name: str = "window_start_time" # TODO think of better name
+    window_start_index_name: str = "window_start_time" 
     datetime_column: str = "window_time_datetime"
     time_in_seconds_column: str = "window_time_seconds"
     window_key_column: str = "window_key"

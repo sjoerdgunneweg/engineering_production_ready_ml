@@ -12,7 +12,7 @@ from flask import Flask, request, jsonify
 from configs.configs import TelemetryConfig, run_config, ModelConfig
 from src.features.feature_extractor import FeatureExtractor
 from src.utils.mlflow_utils import get_latest_run_id
-from src.random_forest import RandomForestModel
+from src.random_forest_model import RandomForestModel
 
 logger = logging.getLogger(__name__)
 

@@ -14,7 +14,7 @@ def test_feature_extractor_data_save():
         std_magnitude_file_name = "foo4"
 
     feature_extractor_data = _FeatureExtractorData()
-    with mock.patch("src.features.feature_extractor.PathsConfig", MockPathsConfig()): # TODO shouldnt it be cofigs.PathsConfig ?
+    with mock.patch("src.features.feature_extractor.PathsConfig", MockPathsConfig):
         with tempfile.TemporaryDirectory() as tmpdir:
             feature_extractor_data.save(tmpdir)
             assert {
@@ -24,11 +24,42 @@ def test_feature_extractor_data_save():
                 MockPathsConfig.std_magnitude_file_name,
             } == set(os.listdir(tmpdir))
 
-def test_feature_extractor_get_features_training_time():
-    pass
+def test_feature_extractor_get_features_training_time(spark_fixture):
+    with mock.patch("src.features.feature_extractor.FeatureExtractor._get_training_features") as mock_get_feat:
+        feature_extractor = FeatureExtractor()
+        # Expecting FeatureExtractor to treat this as training-time as no state has been set
+        feature_extractor.get_features(spark_fixture.createDataFrame([{}]))
+        mock_get_feat.assert_called_once()
 
-def test_feature_extractor_get_features_training():
-    pass
+    with mock.patch("src.features.feature_extractor.FeatureExtractor._get_training_features") as mock_get_feat:
+        feature_extractor = FeatureExtractor()
+        feature_extractor._mean_amount_all_categories = 999.0
+        # Expecting FeatureExtractor to treat this as training-time as not all the state has been set
+        feature_extractor.get_features(spark_fixture.createDataFrame([{}]))
+        mock_get_feat.assert_called_once()
+
+
+def test_feature_extractor_get_features_training(spark_fixture):
+    cases = [
+        {
+            "data": spark_fixture.createDataFrame(
+                [
+                    {"x": 1.0, "y": 2.0, "z": 3.0, "TAC_Reading": 0.03}, 
+                    {"x": 4.0, "y": 5.0, "z": 6.0, "TAC_Reading": 0.09},
+                ]
+            ),
+            "expected": spark_fixture.createDataFrame(
+                [
+                    {"x": 1.0, "y": 2.0, "z": 3.0, "TAC_Reading": 0.03, "energy": 14.0, "magnitude": 3.7416573868, "is_intoxicated": False}, 
+                    {"x": 4.0, "y": 5.0, "z": 6.0, "TAC_Reading": 0.09, "energy": 77.0, "magnitude": 8.7749643874, "is_intoxicated": True},
+                ]
+            ),
+        },
+    ]
+    for case in cases:
+        feature_extractor = FeatureExtractor()
+        out = feature_extractor.get_features(case["data"])
+        assertDataFrameEqual(out, case["expected"], ignoreColumnOrder=True)
 
 def test_feature_extractor_get_is_intoxicated(spark_fixture):
     cases = [

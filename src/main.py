@@ -9,7 +9,7 @@ from mlflow.entities import RunStatus
 
 from pyspark.sql import SparkSession
 from features.feature_extractor import FeatureExtractor
-from random_forest import RandomForestModel
+from src.random_forest_model import RandomForestModel
 
 from configs.configs import PathsConfig, run_config, ModelConfig
 from utils.mlflow_utils import create_mlflow_experiment_if_not_exist, create_mlflow_run_if_not_exists, get_latest_run_id, log_metrics_to_mlflow, save_artifacts_to_mlflow

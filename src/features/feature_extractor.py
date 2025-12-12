@@ -8,7 +8,6 @@ import mlflow
 from pyspark.ml.feature import StringIndexerModel, OneHotEncoderModel
 
 from configs.configs import PathsConfig, run_config
-from pendulum import datetime
 
 from pyspark.sql import functions as F
 
