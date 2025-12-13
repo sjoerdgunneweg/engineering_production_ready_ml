@@ -210,6 +210,9 @@ __marimo__/
 # Dataset
 /data/
 
+!/data/telemetry/
+!/data/telemetry/**
+
 
 src/model.py
 
