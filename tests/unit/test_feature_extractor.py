@@ -61,6 +61,29 @@ def test_feature_extractor_get_features_training(spark_fixture):
         out = feature_extractor.get_features(case["data"])
         assertDataFrameEqual(out, case["expected"], ignoreColumnOrder=True)
 
+def test_feature_extractor_get_features_inference(spark_fixture):
+    cases = [
+        {
+            "data": spark_fixture.createDataFrame(
+                [
+                    {"x": 1.0, "y": 2.0, "z": 3.0}, 
+                    {"x": 4.0, "y": 5.0, "z": 6.0},
+                ]
+            ),
+            "expected": spark_fixture.createDataFrame(
+                [
+                    {"x": 1.0, "y": 2.0, "z": 3.0, "energy": 14.0, "magnitude": 3.7416573868}, 
+                    {"x": 4.0, "y": 5.0, "z": 6.0, "energy": 77.0, "magnitude": 8.7749643874},
+                ]
+            ),
+        },
+    ]
+    for case in cases:
+        feature_extractor = FeatureExtractor()
+        feature_extractor._state.is_set = mock.MagicMock(return_value=True)
+        out = feature_extractor.get_features(case["data"])
+        assertDataFrameEqual(out, case["expected"], ignoreColumnOrder=True)
+
 def test_feature_extractor_get_is_intoxicated(spark_fixture):
     cases = [
         {

@@ -46,7 +46,38 @@ python scripts/prepare_training_data.py
 
 ## End-to-End Operation (Demo)
 
-TODO
+### Demo
+1. Start by running
+```bash
+make up
+```
+2. Once Airflow is up, trigger dag
+
+3. Then run, app
+make up??? TODOD
+
+4. Api calling
+
+5. Opening grafana
+Go to localhost. ..... TODO
+
+
+
+
+
+### Testing
+
+1. Start by running 
+```bash
+make up
+```
+
+2. Once Airflow is up, trigger dag
+
+3. In a new terminal window run:
+```bash
+make test
+```
 
 
 ## Implementation

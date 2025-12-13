@@ -51,7 +51,7 @@ def _combine_raw_tac_files(input_path: str) -> pd.DataFrame:
         
         all_tac_data.append(tac_df)
 
-    if not all_tac_data:
+    if not all_tac_data: 
         logger.warning("No TAC CSV files found or processed.")
         return pd.DataFrame()
         
@@ -59,7 +59,7 @@ def _combine_raw_tac_files(input_path: str) -> pd.DataFrame:
     return tac_combined_df.sort_values([DataConfig.partition_column, DataConfig.tac_time_column])
 
 
-def _add_tac_reading_to_windowed_data(feature_frames_dict: Dict[str, pd.DataFrame], full_tac_df: pd.DataFrame) -> Dict[str, pd.DataFrame]:
+def _add_tac_reading_to_windowed_data(window_features_dict: Dict[str, pd.DataFrame], full_tac_df: pd.DataFrame) -> Dict[str, pd.DataFrame]:
     """
     Adds the closest previous TAC_Reading to each time window 
 
@@ -68,14 +68,14 @@ def _add_tac_reading_to_windowed_data(feature_frames_dict: Dict[str, pd.DataFram
     
     if full_tac_df.empty:
         logger.warning("TAC data could not be loaded.")
-        return feature_frames_dict
+        return window_features_dict
 
     # group TAC data by PID for fast extraction inside the loop
     tac_pd_by_pid = {pid: df for pid, df in full_tac_df.groupby(DataConfig.partition_column)}
 
     features_and_tac_by_pid= {}
 
-    for pid, features_pd in feature_frames_dict.items():
+    for pid, features_pd in window_features_dict.items():
         tac_pd_single_pid = tac_pd_by_pid.get(pid)
 
         if tac_pd_single_pid is None:
@@ -177,5 +177,5 @@ def main():
 
     spark.stop()
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     main()

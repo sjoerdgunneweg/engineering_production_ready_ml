@@ -76,3 +76,72 @@ def test_remove_non_training_features():
     random_forest_model = RandomForestModel()
     out_data = random_forest_model._remove_non_training_features(data)
     pd.testing.assert_frame_equal(out_data, expected_data)
+
+def test_train_model():
+    data = pd.DataFrame({
+        "pid": ["A", "B", "C", "D"],
+        "feature1": [1, 2, 3, 4],
+        "feature2": [4, 5, 6, 7],
+        "is_intoxicated": [0, 1, 0, 1],
+        "TAC_Reading": [0.05, 0.1, 0.03, 0.12],
+    })
+
+    class Mockrun_config:
+        num_folds = 2
+
+    with mock.patch('src.random_forest_model.run_config', Mockrun_config):
+
+        random_forest_model = RandomForestModel()
+        random_forest_model.train_model(data)
+
+    assert random_forest_model._model is not None
+    assert random_forest_model._cv_scores is not None
+
+def test_get_cv_scores():
+    data = pd.DataFrame({
+        "pid": ["A", "B", "C", "D"],
+        "feature1": [1, 2, 3, 4],
+        "feature2": [4, 5, 6, 7],
+        "is_intoxicated": [0, 1, 0, 1],
+        "TAC_Reading": [0.05, 0.1, 0.03, 0.12],
+    })
+
+    class Mockrun_config:
+        num_folds = 2
+
+    with mock.patch('src.random_forest_model.run_config', Mockrun_config):
+
+        random_forest_model = RandomForestModel()
+        random_forest_model.train_model(data)
+        cv_scores = random_forest_model.get_cv_scores()
+
+    assert isinstance(cv_scores, dict)
+    expected_keys = {"fit_time", "score_time", "test_precision", "train_precision", "test_recall", "train_recall", "test_f1", "train_f1", "test_accuracy", "train_accuracy"}
+    assert expected_keys.issubset(set(cv_scores.keys()))
+
+def test_predict():
+    data = pd.DataFrame({
+        "pid": ["A", "B", "C", "D"],
+        "feature1": [1, 2, 3, 4],
+        "feature2": [4, 5, 6, 7],
+        "is_intoxicated": [0, 1, 0, 1],
+        "TAC_Reading": [0.05, 0.1, 0.03, 0.12],
+    })
+
+    features = pd.DataFrame({
+        "feature1": [2, 3],
+        "feature2": [5, 6],
+    })
+
+    class Mockrun_config:
+        num_folds = 2
+
+    with mock.patch('src.random_forest_model.run_config', Mockrun_config):
+
+        random_forest_model = RandomForestModel()
+        random_forest_model.train_model(data)
+
+        predictions = random_forest_model.predict(features)
+
+    assert len(predictions) == len(features)
+    assert all(pred in [0, 1] for pred in predictions)

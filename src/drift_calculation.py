@@ -20,9 +20,6 @@ def get_psi(training_percentages: typing.Tuple[float], latest_percentages: typin
         psi += (latest - training) * math.log(latest / training, math.e)
     return psi
 
-# TODO make monitoring metrics
-
-
 def main():  # pragma: no cover
     with open(PathsConfig.telemetry_training_data_path, "r") as file:
         training_telemetry_data = json.load(file)
@@ -71,5 +68,5 @@ def main():  # pragma: no cover
     push_to_gateway(TelemetryConfig.push_gateway_uri, job="telemetryBatch", registry=registry)
 
 
-if __name__ == "__main__":
+if __name__ == "__main__": # pragma: no cover
     main()

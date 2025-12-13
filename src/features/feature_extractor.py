@@ -57,7 +57,7 @@ class _FeatureExtractorData:
             with open(os.path.join(artifacts_path, "std_magnitude.pkl"), "rb") as f:
                 self._std_magnitude = pickle.load(f)
 
-    def save_to_mlflow(self, run_id: str):  
+    def save_to_mlflow(self, run_id: str):  # pragma: no cover
         """
         Saves the state as an artifact to mlflow, inside the given Run with RunID
 
@@ -76,7 +76,7 @@ class FeatureExtractor:
     def __init__(self):
         self._state = _FeatureExtractorData()
     
-    def save_to_mlflow(self, run_id: str):
+    def save_to_mlflow(self, run_id: str): # pragma: no cover
         self._state.save_to_mlflow(run_id)
 
     def load_from_mlflow(self, run_id: str):
