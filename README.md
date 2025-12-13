@@ -126,5 +126,3 @@ make up
 make test
 ```
 
-
-## Implementation
