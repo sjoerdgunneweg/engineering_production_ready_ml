@@ -45,7 +45,7 @@ class RandomForestModel:
     def get_cv_scores(self) -> dict[str, float]:
         return self._cv_scores
 
-    def load_model_from_mlflow(self, run_id: str) -> None:  # pragma: no cover # TODO why does this work? also put it in the one line of drift calculation
+    def load_model_from_mlflow(self, run_id: str) -> None:  # pragma: no cover
         mlflow_experiment = mlflow.get_experiment_by_name(run_config.experiment_name)
         if mlflow_experiment is None:
             raise RuntimeError(f"Experiment {run_config.experiment_name} does not exist in MLFlow.")

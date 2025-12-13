@@ -56,7 +56,7 @@ services:
 
   telemetry_job: 
     image: alcoholerometer:latest
-    command: ["/bin/sh", "-c", "while true; do sleep 10; python src/drift_calculation.py ; done"]
+    command: ["/bin/sh", "-c", "while true; do sleep 10; python src/telemetry/drift_calculation.py ; done"]
     depends_on:
       - prometheus
 

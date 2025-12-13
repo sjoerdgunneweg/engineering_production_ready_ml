@@ -1,14 +1,8 @@
 Grafana dashboard
 alle TODOS af
-unit tests
 Bind the model folder naar lokaal, zodat de modellen lokaal worden opgeslagen
 Haal misschien energy en ... weg uit inference features zodat je eig alleen tijd en xyz hoort te geven
 
-
-miss meer drift calculation mettrics
-
-
-GA NOG EVEN DOOR TE TESTS HEEN OF ER PASSES ZIJN
 
 
 Miss pid er uit bij preprocessing, want vgm niet meer nodig
@@ -33,3 +27,11 @@ README!!!
 
 
 Welke alert manager in README
+
+TAC READING UIT DE API REQUEST, DAT MAAKT GEEN SENSE!
+
+
+GA NOG EVEN DOOR TE TESTS HEEN OF ER PASSES ZIJN
+
+HAAL DE DATA UIT DE COMMIT FOLDER!, MISS VAN GITHUB PULLEN!
+REMOVE DEZE FILE!

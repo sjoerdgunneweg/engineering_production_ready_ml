@@ -92,7 +92,7 @@ class FeatureExtractor:
         data = self._get_magnitude(data)
         data = self._get_is_intoxicated(data)
 
-        self._set_mean_energy( # TODO what does this do?
+        self._set_mean_energy(
             data.select(F.mean(F.col("energy"))).collect()[0][0], data.select(F.std(F.col("energy"))).collect()[0][0]
         )
         self._set_mean_magnitude(
@@ -138,7 +138,7 @@ class FeatureExtractor:
         """
         return data.withColumn("magnitude", F.sqrt(F.col("energy")))
     
-    def _set_mean_energy(self, mean: float, std: float) -> None: # TODO wat doen deze?
+    def _set_mean_energy(self, mean: float, std: float) -> None:
         self._state._mean_energy = {"mean": mean, "std": std}
     
     def _set_std_energy(self, mean: float, std: float) -> None:

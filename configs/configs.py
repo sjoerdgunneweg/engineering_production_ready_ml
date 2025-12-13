@@ -56,24 +56,7 @@ class _RunConfig:
     metrics_to_log: tuple[str, ...] = ('test_precision', 'train_precision', 'test_recall', 'train_recall', 'test_f1', 'train_f1', 'test_accuracy', 'train_accuracy')
     
 @dataclass(frozen=True)
-class TelemetryConfig: # TODO alter to my style
-    # The number of instances that should be in the live distribution.
-    # As we will need a distribution that represents the "recent" status, we will need to form a distribution from
-    # the "latest" data that the application has received. For this system, we define "latest" as the num_instances_for_live_dist
-    # instances that the app received.
-    # Therefore, we take the latest num_instances_for_live_dist instances as the live distribution for the
-    # calculation of PSI.
-    #
-    # Example:
-    #       num_instances_for_live_dist = 2
-    #
-    #   Call Time,  row id,     value
-    #    10:30        1           0.1
-    #    10:31        2           0.2
-    #    11:32        3           0.3
-    #
-    # Live/"latest" distribution: [0.2, 0.3]
-    #
+class TelemetryConfig:
     num_instances_for_live_dist: int = 3
     epsilon: float = 1 / 1e100
     push_gateway_uri: str = "http://prometheus_push_gateway:9091" # "http://localhost:9091"

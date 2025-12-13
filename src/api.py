@@ -51,9 +51,6 @@ metrics.info(
 )
 
 pred_counter = Counter(f"{run_config.app_name}_predictions", "Count of predictions by class", labelnames=["pred"]) 
-data_quality_counter = Counter(
-    f"{run_config.app_name}_data_quality", "Count of data quality issues", labelnames=["quality_rule"]
-)
 
 reload_counter = Counter(f"{run_config.app_name}_reloads", "Count of model reload requests")
 predict_latency_histogram = Histogram(
@@ -76,13 +73,6 @@ def predict():
     model = get_model()
     feature_extractor = get_feature_extractor_loaded()
     spark = SparkSession.builder.master(run_config.spark_master_url).getOrCreate()
-
-    # if request.json["amount"] < 0: # TODO something like this for data quality checks
-    #     logging.warning("Received negative amount in request.")
-    #     data_quality_counter.labels(quality_rule="neg_amount").inc()
-    # if category_received := request.json["category"] not in feature_extractor.get_known_categories():
-    #     logging.error(f"Received unknown category in request: {category_received}.")
-    #     data_quality_counter.labels(quality_rule="unknown_category").inc()
 
     with predict_latency_histogram.time(): 
         request_data = spark.createDataFrame(

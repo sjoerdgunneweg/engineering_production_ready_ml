@@ -31,13 +31,8 @@ def test_get_preprocessed_data(spark_fixture):
         class MockPathsConfig:
                 accelerometer_with_tac_parquet_path = tmpdir + "/donono"
 
-        class MockRunConfig:
-                sample_rate = 0.5
-                random_seed = 42
-
         with mock.patch('src.data.data_preprocessing.PathsConfig', MockPathsConfig):
-            # with mock.patch('src.data.data_preprocessing.run_config', MockRunConfig):
-            data.write.parquet(MockPathsConfig.accelerometer_with_tac_parquet_path, mode="overwrite") # TODO check if this works
+            data.write.parquet(MockPathsConfig.accelerometer_with_tac_parquet_path, mode="overwrite") 
 
             out = get_preprocessed_data(spark_fixture)
 

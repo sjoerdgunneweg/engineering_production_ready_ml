@@ -1,4 +1,4 @@
-from src.drift_calculation import get_psi
+from src.telemetry.drift_calculation import get_psi
 
 
 def test_get_psi():

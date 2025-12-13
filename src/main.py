@@ -12,6 +12,7 @@ from features.feature_extractor import FeatureExtractor
 from src.random_forest_model import RandomForestModel
 
 from configs.configs import PathsConfig, run_config, ModelConfig
+from telemetry.push_training_metrics import push_last_training_time, push_model_accuracy
 from utils.mlflow_utils import create_mlflow_experiment_if_not_exist, create_mlflow_run_if_not_exists, get_latest_run_id, log_metrics_to_mlflow, save_artifacts_to_mlflow
 
 logging.basicConfig(
@@ -61,7 +62,10 @@ def main(args: argparse.Namespace):
         )
         mlflow.end_run(RunStatus.to_string(RunStatus.FINISHED))
 
-        telemetry_data = { # TODO update to somehting else?
+        push_last_training_time()
+        push_model_accuracy(random_forest_model.get_cv_scores()["test_accuracy"])
+
+        telemetry_data = {
             "is_intoxicated": {
                 False: sum(data["is_intoxicated"] == False),
                 True: sum(data["is_intoxicated"] == True),
