@@ -1,9 +1,4 @@
-Grafana dashboard
-alle TODOS af
-Bind the model folder naar lokaal, zodat de modellen lokaal worden opgeslagen
 Haal misschien energy en ... weg uit inference features zodat je eig alleen tijd en xyz hoort te geven
-
-
 
 Miss pid er uit bij preprocessing, want vgm niet meer nodig
 
@@ -12,16 +7,6 @@ Kijk naar de todo in get training features!!!
 
 Als tijd over, doe nog een is time of day feature en kijk naar andere mgelijkheden!!!
 
-
-Extra metrics according to grafana:
-
-Traffic - How much demand is placed on your system
-Errors - Rate of requests that are failing
-Saturation - How “full” your system is
-
-Zet accuracy enzo er in!
-en throughput
-time since last training
 
 README!!!
 

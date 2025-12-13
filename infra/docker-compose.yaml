@@ -54,6 +54,15 @@ services:
       retries: 3
       interval: 5s
 
+  alertmanager:
+    image: prom/alertmanager:v0.25.0
+    volumes:
+      - "./telemetry/alertmanager.yml:/etc/alertmanager/alertmanager.yml"
+    command: 
+      - '--config.file=/etc/alertmanager/alertmanager.yml'
+    ports:
+      - "9093:9093"
+
   telemetry_job: 
     image: alcoholerometer:latest
     command: ["/bin/sh", "-c", "while true; do sleep 10; python src/telemetry/drift_calculation.py ; done"]
